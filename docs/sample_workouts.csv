@@ -1,0 +1,4 @@
+workout_id,name,category,focus_area,favorite,pause_between_items_sec,items
+WK001,Helkropp kort,Styrke/Spenst,Hele kroppen,True,10,EX001:60;EX002:60;EX003:60
+WK002,Underkropp fokus,Styrke/Spenst,Underkropp,False,10,EX004:60;EX006:60;EX008:60
+WK003,Mobilitet rolig,Mobilitet/Tøying,Hele kroppen,False,10,EX008:90;EX003:60

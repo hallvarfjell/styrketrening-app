@@ -1,0 +1,9 @@
+exercise_id,name,description,progression_tips,default_duration_sec,rpe,category,focus_area,equipment,noise_level
+EX001,Knebøy,"Stå med hoftebreddes avstand, senk setet og reis deg kontrollert.",Øk dybde eller legg til vekter.,60,6,Styrke/Spenst,Underkropp,nei,Low
+EX002,Push-up,"Hold kroppen strak, senk brystet mot gulvet og press opp.",Hev føtter eller øk tempo.,60,5,Styrke/Spenst,Overkropp,nei,Low
+EX003,Planke,"Underarmer i gulvet, hold kroppen strak.",Løft ett ben eller arm.,60,4,Balanse/Stabilisering,Hele kroppen,nei,Low
+EX004,Utfall,"Gå frem i utfall, senk kne og press opp.",Gå utfall bakover eller legg til vekter.,60,6,Styrke/Spenst,Underkropp,nei,Medium
+EX005,Roing med strikk,Fest strikk og trekk mot kroppen.,Strammere strikk eller flere repetisjoner.,60,5,Styrke/Spenst,Overkropp,strikk,Low
+EX006,Step-up,"Opp på step-benken og ned igjen, vekselvis.",Høyere step eller legg til vekter.,60,6,Styrke/Spenst,Underkropp,step,Medium
+EX007,Hoppetau,"Jevn rytme, små hopp.",Dobbelhopp.,60,7,Styrke/Spenst,Hele kroppen,hoppetau,High
+EX008,Tøying hamstrings,Sitt og strekk mot tærne.,Hold lengre tid.,60,3,Mobilitet/Tøying,Underkropp,nei,Low
