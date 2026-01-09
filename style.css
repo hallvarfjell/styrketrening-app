@@ -1,0 +1,21 @@
+
+:root { --bg:#f9fafb; --fg:#222; --muted:#666; --accent:#4c7a9f; --accent2:#c9a66b; --border:#e5e7eb; }
+body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); margin:0; }
+.topbar { position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; padding:10px 16px; }
+.topbar .brand { display:flex; align-items:center; gap:8px; font-weight:bold; }
+.topbar img { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); }
+.nav { display:flex; gap:8px; }
+.nav-btn { padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; }
+.nav-btn.active { border-color: var(--accent); color: var(--accent); }
+.container { max-width:1000px; margin:0 auto; padding:16px; }
+.card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
+.flex { display:flex; gap:12px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:700px){ .grid-2{ grid-template-columns:1fr; } }
+.button { background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.button.secondary { background:var(--accent2); }
+.input { padding:6px 8px; border:1px solid var(--border); border-radius:8px; width:100%; }
+.progress { height:10px; border:1px solid var(--border); border-radius:6px; overflow:hidden; background:#f3f4f6; }
+.progress .bar { height:100%; background:var(--accent); width:0%; }
+.small { color:var(--muted); font-size:12px; }
+.footer { text-align:center; padding:12px; color:var(--muted); }

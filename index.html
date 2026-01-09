@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styrketreningsapp</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Logo" />
+      <span>Styrketrening</span>
+    </div>
+    <nav class="nav">
+      <button data-route="dashboard" class="nav-btn active">Dashboard</button>
+      <button data-route="library" class="nav-btn">Øktvelger</button>
+      <button data-route="editor" class="nav-btn">Editor</button>
+      <button data-route="log" class="nav-btn">Logg</button>
+    </nav>
+  </header>
+
+  <main id="app" class="container"></main>
+
+  <footer class="footer">© 2026</footer>
+
+  <script src="app.js"></script>
+  <script src="modules/dashboard.js"></script>
+  <script src="modules/library.js"></script>
+  <script src="modules/editor.js"></script>
+  <script src="modules/session.js"></script>
+  <script src="modules/log.js"></script>
+</body>
+</html>
