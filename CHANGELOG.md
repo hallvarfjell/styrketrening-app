@@ -29,6 +29,7 @@ DASHBOARD:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
 - Ønsker en nedtellingstidtaker både for den enkelte øvelsen (også pausen) og også en nedtellingstidtager for hele økta.
 - Når hele økta er ferdig kan "Avslutt og lagre"-knappen erstattes med en "Lagre"-knapp uten bekreftelse.
+- knapper for skipping av øvelser. 
 
 LOGG
 - Mer fantastisk statistikk og grafer på progresjon
