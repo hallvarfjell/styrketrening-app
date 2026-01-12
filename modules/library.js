@@ -1,6 +1,5 @@
 
-<script>
-// Øktvelger: importer/eksporter økter (CSV, semikolon), favoritter, filtring/sortering etter utstyr
+// Øktvelger: importer/eksporter økter (CSV, semikolon), favoritter, filtrering/sortering etter utstyr
 
 const Library = {
   render(){
@@ -170,4 +169,3 @@ const Library = {
 };
 
 window.Library = Library;
-</script>
