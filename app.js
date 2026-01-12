@@ -1,5 +1,4 @@
 
-<script>
 // Enkel SPA-router + global state + robuste CSV-verktøy
 
 const Store = {
@@ -90,7 +89,7 @@ function setActive(route){
 }
 
 function navigate(route){
-  // Viktig: Nullstill globale tastelyttere så Editor kan bruke SPACE i tekstfelt!
+  // Nullstill globale tastelyttere (viktig for Editor, så SPACE i tekstfelt fungerer)
   window.onkeydown = null;
 
   AppState.currentRoute = route;
@@ -113,5 +112,4 @@ window.AppState = AppState;
 window.Store    = Store;
 window.Util     = Util;
 window.navigate = navigate;
-</script>
 ``
