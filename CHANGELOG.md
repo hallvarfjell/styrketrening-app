@@ -10,19 +10,21 @@ GENERELT:
 
 DASHBOARD:
 - På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker at disse samles i en menyknapp (sånn med tre streker)
+- Jeg ønsker at alle økter som er merket som favoritt i øktvelger-modulen vises. Antall av siste økter som vises er tre.
+
 
 ØKTVELGER
+- Det skjer en feil med beskrivelsen når øvelsene importeres. Der beskrivelsen av øvelsen inneholder komma så tolker programmet det som at beskrivelsen er ferdig. Jeg vil at CSV-filene som appen bruker skal være semikolondelt.
+- I øktvelger-modulen skal man kunne velge så mange favoritter man vil
 - Øktvelgeren må kunne sortere på hvilket utstyr jeg har tilgjengelig.
 - Eksport økter støtter tydeligvis ikke Æ, Ø eller Å. Må fikses.
-- Eksport øvelser er unødvendig da det ikke går an å redigere øvelser i appen.
-- Filteret i øktvelgeren finner ikke igjen alle eksempeløktene, men den filtrerer korrekt på øktene jeg selv har laget. Sannsynligvis feil i eksempeløktene.
+- Import- og eksportfunksjonen for øvelser flyttes til editor-modulen.
 
 EDITOR
-- Det skjer en feil med beskrivelsen når øvelsene importeres. Der beskrivelsen av øvelsen inneholder komma så tolker programmet det som at beskrivelsen er ferdig.
-- Drag-n-drop på økt og øvelsesimporten virker ikke
-- Tekst med kolonnenavn (exercise_id, name… etc) i økt- og øvelsesimporten er unødvendig. Fjern det.
-- Det går ikke an å bruke mellomromstasten i øktnavn i editor. Det går an å lime inn et mellomrom men dette er tungvint.
-- Jeg ønsker mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
+- Jeg ønsker at import- og eksportfunksjon av øvelser er i Editor-modulen. Jeg ønsker også mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
+- Jeg ønsker ikke ha progresjonstips som egen kolonne. Dette skal inkluderes i beskrivelsesteksten til øvelsen.
+- Fjerne tekst "Kolonner (øvelser): exercise_id,name,description,progression_tips,default_duration_sec,rpe,category,focus_area,equipment, etc" i feltet for "Importer øvelser (CSV) og økter (CSV)".
+- Det går ikke an å bruke mellomromstasten i øktnavn i editor. 
 
 ØKTKJØRINGEN:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
