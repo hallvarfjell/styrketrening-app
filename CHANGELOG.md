@@ -24,6 +24,10 @@ DASHBOARD:
 - Utstyrsfilteret: Fjern boksen for "Nei". Fjern boksen for "Vis kun økter som passer for valgt utstyr". Listen over øvelser under "Filtrer og velg økt" skal til enhver tid bare vise øvelser som enten ikke krever utstyr eller der utstyret som kreves er avmerket. Dersom nytt utstyr blir tatt med når man lager en ny øvelse i Editor må dette utstyret komme med i filteret.
 - Det må gå an å slette økter.
 
+- REV03
+- Utstyrsfilteret: Fjern boksen for "Nei". JEg har fjernet "Nei" som utstyr i øvelseslista for å unngå forvirring.
+- Legg nye økter øverst i lista
+
 EDITOR
 - Jeg ønsker at import- og eksportfunksjon av øvelser er i Editor-modulen. Jeg ønsker også mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
 - Jeg ønsker ikke ha progresjonstips som egen kolonne. Dette skal inkluderes i beskrivelsesteksten til øvelsen.
@@ -37,14 +41,19 @@ EDITOR
 - "Legg til øvelse"-feltet skal ikke ha forhåndsutfylte tekstbokser slik som Styrke/spenst (Her skal det heller stå "Kategori" i grått, slik som i "Navn" og "Beskrivelse" tekstboksene. Utstyrsteksboksen må gi en drop-down meny der du kan velge utstyr som finnes fra før, men man skal også kunne fylle inn nytt utstyr.
 - Spesifikk varighet på en øvelse, slik den er definert i øvelsesbiblioteket, skal brukes. Standard varighet på 1 minutt brukes bare der spesifikk varighet mangler.
 - Det må gå an å slette øvelser
-- 
 
+- Rev03:
+-   Legg nye øvelser øverst i lista
+-   Knappen for å slette en øvelse skal virke på selve øvelsen i øvelsesoversikten. Slik den virker nå sletter den bare en øvelse i en økt som er under utarbeidelse.
+-   Filter for RPE og lyd skal være en drop-down, der henholdsvis REP og Lydnivå står med grå skrift før verdi er valgt (for at brukeren skal forstå hva han filtrerer på). Verdiene i drop-down menyene skal være de samme som ligger i øvelsesbiblioteket.
 
 ØKTKJØRINGEN:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
 - Ønsker en nedtellingstidtaker både for den enkelte øvelsen (også pausen) og også en nedtellingstidtager for hele økta.
 - Når hele økta er ferdig kan "Avslutt og lagre"-knappen erstattes med en "Lagre"-knapp uten bekreftelse.
-- knapper for skipping av øvelser. 
+- knapper for skipping av øvelser.
+- På telefonen stopper økta plutselig midt i en øvelse (progressbaren) og lar seg ikke starte igjen. Tida har likevel fortsatt å telle når man ser tidsforbruket i loggen.
+- Automatisk start når Startknapp i Øktvelger eller Dashboard trykkes.
 
 LOGG
 - Mer fantastisk statistikk og grafer på progresjon
