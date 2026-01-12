@@ -28,6 +28,9 @@ DASHBOARD:
 - Utstyrsfilteret: Fjern boksen for "Nei". JEg har fjernet "Nei" som utstyr i øvelseslista for å unngå forvirring.
 - Legg nye økter øverst i lista
 
+- REV04:
+- Vil ha knapp for "Velg alle". 
+
 EDITOR
 - Jeg ønsker at import- og eksportfunksjon av øvelser er i Editor-modulen. Jeg ønsker også mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
 - Jeg ønsker ikke ha progresjonstips som egen kolonne. Dette skal inkluderes i beskrivelsesteksten til øvelsen.
@@ -46,6 +49,12 @@ EDITOR
 -   Legg nye øvelser øverst i lista
 -   Knappen for å slette en øvelse skal virke på selve øvelsen i øvelsesoversikten. Slik den virker nå sletter den bare en øvelse i en økt som er under utarbeidelse.
 -   Filter for RPE og lyd skal være en drop-down, der henholdsvis REP og Lydnivå står med grå skrift før verdi er valgt (for at brukeren skal forstå hva han filtrerer på). Verdiene i drop-down menyene skal være de samme som ligger i øvelsesbiblioteket.
+
+-   Rev04:
+-   Tekstboksen for sortering av kategori fungerer tilsynelatende ikke. Jeg vil ha en drop-down meny slik som Fokus Boksen. Det kan stå "Kategori (alle)" der dersom den ikke blir brukt.
+-   Sorteringsboksen for RPE fungerer tilsynelatende ikke. Den har en dropdown-meny men det er ingen andre verdier enn RPE der.
+-   Redigeringsknapp på hver øvelse.
+-   Filteret fungerer ikkje særlig bra. Filteret Kanskje heller ha en dropdown med multiple choice, inkl alle
 
 ØKTKJØRINGEN:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
