@@ -1,5 +1,4 @@
 
-<script>
 // Editor: filter øvelser, bygg økt, lagre; IMPORT/EXPORT av øvelser; Legg til ny øvelse
 
 const Editor = {
@@ -17,7 +16,7 @@ const Editor = {
             <button class="button secondary" id="exportEx">Eksporter øvelser (CSV)</button>
           </div>
         </div>
-        <div class="small">CSV er <strong>semikolondelt</strong>. Ved import, hvis kolonnen <code>progression_tips</code> finnes, appendes den til <code>description</code> (ingen egen kolonne).</div>
+        <div class="small">CSV er <strong>semikolondelt</strong>. Hvis kolonnen <code>progression_tips</code> finnes, appendes den til <code>description</code> (ingen egen kolonne).</div>
 
         <h3 style="margin-top:12px;">Legg til ny øvelse</h3>
         <div class="grid-2">
@@ -245,4 +244,4 @@ const Editor = {
 };
 
 window.Editor = Editor;
-</script>
+``
