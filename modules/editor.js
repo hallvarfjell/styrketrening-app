@@ -1,18 +1,28 @@
 
-// Editor: venstre = Filter øvelser. Høyre (øverst→nederst) = Bygg økt, Legg til øvelse, Øvelsesbibliotek (import/eksport).
-// Filter inkluderer: utstyr (dynamisk), RPE, støy (noise), kategori, fokus, søk.
-// Legg til øvelse: kun placeholders, utstyr med autocomplete (datalist) + mulighet for nye.
-// Når øvelse legges i økt → bruk default_duration_sec fra øvelsesbiblioteket (ellers 60).
-// Slett øvelse fra bibliotek støttes.
+// Editor:
+// - Venstre: "Filter øvelser" (utstyr, RPE i dropdown, Lydnivå i dropdown, kategori (tekst), fokus (dropdown), søk).
+// - Høyre: "Bygg økt" (øverst), "Legg til øvelse" (midten), "Øvelsesbibliotek import/eksport" (nederst).
+// - Legg ny øvelse øverst i lista (sortering på created_at desc).
+// - Slett øvelse-knapp i øvelsesoversikten sletter fra biblioteket (og fjerner fra ALLE økter).
+// - Når øvelse legges i økt → bruk e.default_duration_sec hvis satt, ellers 60.
+// - Nye økter får created_at ved lagring (slik at Øktvelger kan sortere nye økter øverst).
 
 const Editor = {
   render(existing=null){
-    const w = existing || { workout_id:`WK${Date.now()}`, name:'', category:'Styrke/Spenst', focus_area:'Hele kroppen', favorite:false, pause_between_items_sec:10, items:[] };
+    const w = existing || { workout_id:`WK${Date.now()}`, name:'', category:'Styrke/Spenst', focus_area:'Hele kroppen', favorite:false, pause_between_items_sec:10, items:[], created_at: Date.now() };
 
-    // Dynamisk utstyrs-union (for filter og autocomplete)
-    const equipmentSet = new Set();
-    (AppState.exercises || []).forEach(e => (e.equipment || []).forEach(eq => { if (eq) equipmentSet.add(eq); }));
-    const allEquipment = Array.from(equipmentSet).sort(); // inkl. 'nei'
+    // Dynamiske oppslagslister
+    const eqSet = new Set();
+    const rpeSet = new Set();
+    const noiseSet = new Set();
+    (AppState.exercises || []).forEach(e => {
+      (e.equipment || []).forEach(eq => { if (eq && eq !== 'nei') eqSet.add(eq); });
+      if (typeof e.rpe === 'number' && !Number.isNaN(e.rpe)) rpeSet.add(e.rpe);
+      if (e.noise_level) noiseSet.add(e.noise_level);
+    });
+    const allEquipment = Array.from(eqSet).sort();           // uten 'nei'
+    const allRpe       = Array.from(rpeSet).sort((a,b)=>a-b);
+    const allNoise     = Array.from(noiseSet).sort((a,b)=>String(a).localeCompare(String(b)));
 
     render(`
       <div class="grid-2">
@@ -20,43 +30,56 @@ const Editor = {
         <div>
           <div class="card">
             <h3>Filter øvelser</h3>
+
             <div class="flex">
-              <select id="fFocus" class="input"><option value="">Fokus (alle)</option><option>Overkropp</option><option>Underkropp</option><option>Hele kroppen</option></select>
-              <input id="fCat" class="input" placeholder="Kategori (f.eks. Styrke/Spenst)" />
+              <select id="fFocus" class="input">
+                <option value="">Fokus (alle)</option>
+                <option>Overkropp</option>
+                <option>Underkropp</option>
+                <option>Hele kroppen</option>
+              </select>
+              <input id="fCat" class="input" placeholder="Kategori" />
             </div>
+
             <div class="flex">
               <input id="fSearch" class="input" placeholder="Søk (navn/beskrivelse)" />
             </div>
-            <div>
-              <div class="small" style="margin-top:8px;">Utstyr (velg alle som er relevante):</div>
-              <div class="flex" id="fEquip">
-                ${allEquipment.map(eq => `
-                  <label><input type="checkbox" class="f-eq" value="${eq}"> ${eq}</label>
-                `).join(' ')}
-              </div>
+
+            <div class="small" style="margin-top:8px;">Utstyr:</div>
+            <div class="flex" id="fEquip">
+              ${allEquipment.map(eq => `
+                <label><input type="checkbox" class="f-eq" value="${eq}"> ${eq}</label>
+              `).join(' ')}
             </div>
+
             <div class="flex" style="margin-top:8px;">
-              <input id="fRpeMin" type="number" min="1" max="9" class="input" placeholder="RPE min (1-9)" />
-              <input id="fRpeMax" type="number" min="1" max="9" class="input" placeholder="RPE max (1-9)" />
+              <select id="fRpe" class="input">
+                <option value="">RPE</option>
+                ${allRpe.map(v => `<option value="${v}">${v}</option>`).join('')}
+              </select>
+              <select id="fNoise" class="input">
+                <option value="">Lydnivå</option>
+                ${allNoise.map(v => `<option value="${v}">${v}</option>`).join('')}
+              </select>
             </div>
-            <div class="flex">
-              <label><input type="checkbox" class="f-noise" value="Low"> Low</label>
-              <label><input type="checkbox" class="f-noise" value="Medium"> Medium</label>
-              <label><input type="checkbox" class="f-noise" value="High"> High</label>
-            </div>
+
             <div id="exlist" style="margin-top:12px;"></div>
           </div>
         </div>
 
         <!-- HØYRE KOLONNE -->
         <div>
-          <!-- Øverst: BYGG ØKT -->
+          <!-- BYGG ØKT (øverst) -->
           <div class="card">
             <h3>Bygg økt</h3>
             <input id="name" class="input" placeholder="Øktnavn" value="${w.name}" />
             <div class="flex">
               <input id="cat"   class="input" placeholder="Kategori" value="${w.category}" />
-              <select id="focus" class="input"><option>Hele kroppen</option><option>Overkropp</option><option>Underkropp</option></select>
+              <select id="focus" class="input">
+                <option>Hele kroppen</option>
+                <option>Overkropp</option>
+                <option>Underkropp</option>
+              </select>
             </div>
             <div id="items"></div>
             <div class="flex">
@@ -64,7 +87,7 @@ const Editor = {
             </div>
           </div>
 
-          <!-- Under: LEGG TIL ØVELSE (kun placeholders + autocomplete for utstyr) -->
+          <!-- LEGG TIL ØVELSE (midten) -->
           <div class="card">
             <h3>Legg til øvelse</h3>
             <input id="new_name"        class="input" placeholder="Navn" />
@@ -75,19 +98,25 @@ const Editor = {
             </div>
             <div class="flex">
               <input id="new_cat"   class="input" placeholder="Kategori" />
-              <select id="new_focus" class="input"><option>Hele kroppen</option><option>Overkropp</option><option>Underkropp</option></select>
+              <select id="new_focus" class="input">
+                <option>Hele kroppen</option>
+                <option>Overkropp</option>
+                <option>Underkropp</option>
+              </select>
             </div>
             <div class="flex">
               <input id="new_equip" class="input" placeholder="Utstyr (kommaseparert)" list="equipmentList" />
               <datalist id="equipmentList">
                 ${allEquipment.map(eq => `<option value="${eq}">`).join('')}
               </datalist>
-              <select id="new_noise" class="input"><option>Low</option><option>Medium</option><option>High</option></select>
+              <select id="new_noise" class="input">
+                <option>Low</option><option>Medium</option><option>High</option>
+              </select>
             </div>
             <button class="button" id="addExercise">Legg til øvelse</button>
           </div>
 
-          <!-- Nederst: ØVELSESBIBLIOTEK IMPORT/EKSPORT -->
+          <!-- ØVELSESBIBLIOTEK (nederst) -->
           <div class="card">
             <h3>Øvelsesbibliotek</h3>
             <div class="flex">
@@ -113,17 +142,17 @@ const Editor = {
       reader.onload = () => {
         const rows = Util.parseCSV(reader.result, ';');
         AppState.exercises = rows.map(r => {
-          // progression_tips fjernet — append til description hvis finnes
+          // progression_tips inn i description (ikke egen kolonne)
           const desc = (r.description || '');
           const prog = (r.progression_tips || '').trim();
           const fullDesc = prog ? `${desc}\nProgresjon: ${prog}` : desc;
-
-          // equipment: normaliser til array (kommaseparert / semikolon)
+          // equipment normaliseres (uten 'nei')
           const equipments = (r.equipment || '')
             .replace(/;/g, ',')
             .split(',')
             .map(x=>x.trim())
-            .filter(Boolean);
+            .filter(Boolean)
+            .filter(x => x !== 'nei');
 
           return {
             exercise_id:           r.exercise_id || `EX${Date.now()}`,
@@ -133,13 +162,14 @@ const Editor = {
             rpe:                   Number(r.rpe || 5),
             category:              r.category,
             focus_area:            r.focus_area,
-            equipment:             equipments.length ? equipments : ['nei'],
-            noise_level:           r.noise_level || 'Low'
+            equipment:             equipments,            // tom array = ingen utstyr
+            noise_level:           r.noise_level || 'Low',
+            created_at:            Number(r.created_at || Date.now())
           };
         });
         Store.save(Store.keys.exercises, AppState.exercises);
         alert(`Importert ${AppState.exercises.length} øvelser.`);
-        Editor.render(w); // re-render for å oppdatere utstyrslister/filter dynamisk
+        Editor.render(w); // re-render: filter, datalist og rekkefølge oppdateres
       };
       reader.readAsText(file);
     };
@@ -154,7 +184,7 @@ const Editor = {
       Util.download('exercises.csv', csv, 'text/csv');
     };
 
-    // --- Legg til ny øvelse (placeholders; utstyr via datalist + fritekst) ---
+    // --- Legg til ny øvelse: nye øvelser øverst (created_at nå) ---
     document.getElementById('addExercise').onclick = () => {
       const name  = (document.getElementById('new_name').value || '').trim();
       const desc  = (document.getElementById('new_desc').value || '').trim();
@@ -166,11 +196,13 @@ const Editor = {
       const noise = document.getElementById('new_noise').value;
 
       if (!name) return alert('Navn mangler');
+
       const equip = equipStr
         .replace(/;/g, ',')
         .split(',')
         .map(x=>x.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .filter(x => x !== 'nei');
 
       const ex = {
         exercise_id: `EX${Date.now()}`,
@@ -180,47 +212,53 @@ const Editor = {
         rpe: Number.isFinite(rpe) ? rpe : 5,
         category: cat || 'Styrke/Spenst',
         focus_area: focus,
-        equipment: equip.length ? equip : ['nei'],
-        noise_level: noise
+        equipment: equip, // tom array = ingen utstyr
+        noise_level: noise,
+        created_at: Date.now()
       };
-      AppState.exercises.push(ex);
+
+      // Legg øverst: enten unshift, eller push + sort ved rendering — vi velger unshift for rask respons.
+      AppState.exercises.unshift(ex);
       Store.save(Store.keys.exercises, AppState.exercises);
       alert('Øvelse lagt til');
-      Editor.render(w); // re-render for å oppdatere filter og utstyrs-autocomplete
+      Editor.render(w); // re-render for å oppdatere filter/datalist og sortering
     };
 
     // --- Filter & liste over øvelser ---
     function matchesFilters(e){
-      const fFocus = document.getElementById('fFocus').value;
-      const fCat   = (document.getElementById('fCat').value || '').trim().toLowerCase();
-      const fSearch= (document.getElementById('fSearch').value || '').trim().toLowerCase();
+      const fFocus  = document.getElementById('fFocus').value;
+      const fCat    = (document.getElementById('fCat').value || '').trim().toLowerCase();
+      const fSearch = (document.getElementById('fSearch').value || '').trim().toLowerCase();
 
-      const selectedEq = Array.from(document.querySelectorAll('.f-eq:checked')).map(c=>c.value);
-      const rpeMinVal = Number(document.getElementById('fRpeMin').value || NaN);
-      const rpeMaxVal = Number(document.getElementById('fRpeMax').value || NaN);
-      const selectedNoise = Array.from(document.querySelectorAll('.f-noise:checked')).map(c=>c.value);
+      const selectedEq   = Array.from(document.querySelectorAll('.f-eq:checked')).map(c=>c.value);
+      const selectedRpe  = document.getElementById('fRpe').value;
+      const selectedNoise= document.getElementById('fNoise').value;
 
-      // Fokus
       if (fFocus && e.focus_area !== fFocus) return false;
-      // Kategori (delstreng)
       if (fCat && !(e.category || '').toLowerCase().includes(fCat)) return false;
-      // Søk (navn + beskrivelse)
+
       const text = `${e.name || ''} ${e.description || ''}`.toLowerCase();
       if (fSearch && !text.includes(fSearch)) return false;
-      // Utstyr: hvis ingenting valgt, ingen begrensning; ellers må alle e.equipment (unntatt 'nei') være subset av valgt
+
+      // Utstyr: hvis ingen valgt → ingen begrensning; ellers må alle krav (unntatt 'nei') være subset
       const req = (e.equipment || []).filter(eq => eq !== 'nei');
       if (selectedEq.length && !req.every(eq => selectedEq.includes(eq))) return false;
-      // RPE
-      if (Number.isFinite(rpeMinVal) && (e.rpe || 0) < rpeMinVal) return false;
-      if (Number.isFinite(rpeMaxVal) && (e.rpe || 0) > rpeMaxVal) return false;
-      // Noise
-      if (selectedNoise.length && !selectedNoise.includes(e.noise_level || 'Low')) return false;
+
+      // RPE dropdown: eksakt lik valgt verdi
+      if (selectedRpe && String(e.rpe) !== selectedRpe) return false;
+
+      // Noise dropdown
+      if (selectedNoise && (e.noise_level || 'Low') !== selectedNoise) return false;
 
       return true;
     }
 
     function renderExercises(){
       const list = (AppState.exercises || []).filter(matchesFilters);
+
+      // Nye øvelser øverst: sorter på created_at desc
+      list.sort((a,b) => Number(b.created_at||0) - Number(a.created_at||0));
+
       const html = list.map(e=>`
         <div class="card">
           <div><strong>${e.name}</strong> <span class="small">${e.category} • ${e.focus_area}</span></div>
@@ -233,7 +271,7 @@ const Editor = {
       `).join('');
       document.getElementById('exlist').innerHTML = html || '<div class="card small">Ingen øvelser matcher filteret.</div>';
 
-      // Legg til øvelsen i økt – bruker spesifikk varighet hvis finnes
+      // Legg til øvelse i økt – bruk spesifikk varighet
       document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
         const ex = AppState.exercises.find(x=>x.exercise_id===b.dataset.add);
         const dur = Number(ex?.default_duration_sec || 60);
@@ -241,17 +279,23 @@ const Editor = {
         renderItems();
       });
 
-      // Slett øvelse
+      // Slett øvelse fra biblioteket (og fjern fra ALLE økter)
       document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
         const eid = b.dataset.del;
         const idx = AppState.exercises.findIndex(x=>x.exercise_id===eid);
         if (idx>=0 && confirm('Slette øvelsen?')) {
           AppState.exercises.splice(idx,1);
           Store.save(Store.keys.exercises, AppState.exercises);
-          // Fjern øvelsen fra pågående økt hvis den var med
-          w.items = (w.items||[]).filter(it => it.exercise_id !== eid);
+          // Fjern fra ALLE økter
+          AppState.workouts.forEach(W => {
+            if (Array.isArray(W.items)) {
+              W.items = W.items.filter(it => it.exercise_id !== eid);
+            }
+          });
           Store.save(Store.keys.workouts, AppState.workouts);
-          Editor.render(w); // re-render for å oppdatere filter/utstyrs-autocomplete og items
+          // Også fra pågående økt i editor
+          w.items = (w.items||[]).filter(it => it.exercise_id !== eid);
+          Editor.render(w);
         }
       });
     }
@@ -290,7 +334,7 @@ const Editor = {
       });
     }
 
-    // Init
+    // Init listene
     renderExercises(); renderItems();
 
     // Filter-hendelser
@@ -298,15 +342,15 @@ const Editor = {
     document.getElementById('fCat').oninput    = renderExercises;
     document.getElementById('fSearch').oninput = renderExercises;
     document.querySelectorAll('.f-eq').forEach(c => c.onchange = renderExercises);
-    document.getElementById('fRpeMin').oninput = renderExercises;
-    document.getElementById('fRpeMax').oninput = renderExercises;
-    document.querySelectorAll('.f-noise').forEach(c => c.onchange = renderExercises);
+    document.getElementById('fRpe').onchange   = renderExercises;
+    document.getElementById('fNoise').onchange = renderExercises;
 
-    // Lagre økt
+    // Lagre økt (sett created_at hvis ny)
     document.getElementById('save').onclick = () => {
       w.name       = document.getElementById('name').value || 'Ny økt';
       w.category   = document.getElementById('cat').value || 'Styrke/Spenst';
       w.focus_area = document.getElementById('focus').value;
+      if (!w.created_at) w.created_at = Date.now();
 
       // Beregn (utstyr, lydnivå, RPE, total tid)
       const equipSet = new Set(); let rpeSum=0, rpeCount=0; const noiseLevels={Low:1,Medium:2,High:3}; let noiseMax=1;
@@ -326,7 +370,7 @@ const Editor = {
       };
 
       const idx = AppState.workouts.findIndex(x=>x.workout_id===w.workout_id);
-      if (idx>=0) AppState.workouts[idx] = w; else AppState.workouts.push(w);
+      if (idx>=0) AppState.workouts[idx] = w; else AppState.workouts.unshift(w); // nye økter legges øverst
       Store.save(Store.keys.workouts, AppState.workouts);
       alert('Økt lagret.');
       Library.render(); setActive('library');
@@ -335,3 +379,4 @@ const Editor = {
 };
 
 window.Editor = Editor;
+``
