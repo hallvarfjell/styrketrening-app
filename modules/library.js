@@ -1,8 +1,15 @@
 
-// Øktvelger: importer/eksporter økter (CSV, semikolon), favoritter, filtrering/sortering etter utstyr
+// Øktvelger: semikolon-CSV import/eksport, favoritter, dynamisk utstyrsfilter uten "nei" og uten "Vis kun passende",
+// alltid filtrert slik at bare økter som ikke krever utstyr eller krever utstyr som er valgt, vises.
+// Sletting av økter støttes.
 
 const Library = {
   render(){
+    // Finn alle utstyrstyper som finnes i øvelsesbiblioteket (union), ekskluder 'nei'
+    const equipmentSet = new Set();
+    (AppState.exercises || []).forEach(e => (e.equipment || []).forEach(eq => { if (eq && eq !== 'nei') equipmentSet.add(eq); }));
+    const allEquipment = Array.from(equipmentSet).sort();
+
     render(`
       <div class="card">
         <h2>Importer/eksporter økter (CSV)</h2>
@@ -15,17 +22,16 @@ const Library = {
             <button class="button secondary" id="exportWk">Eksporter økter (CSV)</button>
           </div>
         </div>
-        <div class="small">CSV er <strong>semikolondelt</strong>. Feltet <code>items</code> bruker <strong>|</strong> mellom øvelser (f.eks. <code>EX001:60|EX002:60</code>).</div>
+        <div class="small">CSV er <strong>semikolondelt</strong>. Feltet <code>items</code> bruker <strong>|</strong> som separator (f.eks. <code>EX001:60|EX002:60</code>).</div>
       </div>
 
       <div class="card">
         <h2>Utstyr jeg har tilgjengelig</h2>
         <div class="flex">
-          ${['nei','boks','step','strikk','medisinball','hoppetau'].map(eq=>`
+          ${allEquipment.map(eq => `
             <label><input type="checkbox" class="eq-have" value="${eq}"> ${eq.charAt(0).toUpperCase()}${eq.slice(1)}</label>
           `).join(' ')}
         </div>
-        <label class="small"><input type="checkbox" id="onlyCompatible"> Vis kun økter som passer valgt utstyr</label>
       </div>
 
       <div class="card">
@@ -86,63 +92,54 @@ const Library = {
       Util.download('workouts.csv', csv, 'text/csv');
     };
 
-    // Render listen (med filter/sortering etter utstyr)
+    // Hent utstyr for en økt (union av øvelsers utstyr)
+    const getEquipForWorkout = (w) => {
+      const s = new Set();
+      (w.items||[]).forEach(it => {
+        const ex = AppState.exercises.find(e=>e.exercise_id===it.exercise_id);
+        (ex?.equipment||[]).forEach(eq => s.add(eq));
+      });
+      return Array.from(s);
+    };
+
+    // Render liste med utstyrsfilter alltid aktivt
     function renderList(){
       const focus = document.getElementById('filterFocus').value;
       const cat   = document.getElementById('filterCat').value;
-      const have  = Array.from(document.querySelectorAll('.eq-have:checked')).map(c=>c.value);
-      const only  = document.getElementById('onlyCompatible').checked;
+      const selected = Array.from(document.querySelectorAll('.eq-have:checked')).map(c=>c.value);
 
-      // Avled utstyr pr. økt (fra øvelser)
-      const getEquipForWorkout = (w) => {
-        const s = new Set();
-        (w.items||[]).forEach(it => {
-          const ex = AppState.exercises.find(e=>e.exercise_id===it.exercise_id);
-          (ex?.equipment||[]).forEach(eq => s.add(eq));
-        });
-        return Array.from(s);
-      };
-
-      // Filtrer på fokus/kategori
       let list = AppState.workouts.slice();
+
+      // Fokus/kategori
       if (focus) list = list.filter(w=>w.focus_area===focus);
       if (cat)   list = list.filter(w=>w.category  ===cat);
 
-      // Filtrer på utstyr (valgfritt)
-      if (only && have.length){
-        list = list.filter(w => {
-          const req = getEquipForWorkout(w);
-          return req.every(eq => have.includes(eq) || eq==='nei'); // krever ikke annet enn tilgjengelig
-        });
-      }
+      // Utstyrsfilter: alltid aktiv
+      // - Hvis selected er tom → vis kun økter som krever "nei" (dvs. ingen utstyr)
+      // - Ellers → vis økter der alle krav != 'nei' er subset av selected
+      list = list.filter(w => {
+        const req = getEquipForWorkout(w);
+        const reqNoNei = req.filter(eq => eq !== 'nei');
+        if (selected.length === 0) return reqNoNei.length === 0;
+        return reqNoNei.every(eq => selected.includes(eq));
+      });
 
-      // Sorter: økter som passer valgt utstyr først
-      if (have.length){
-        list.sort((a,b) => {
-          const reqA = getEquipForWorkout(a);
-          const reqB = getEquipForWorkout(b);
-          const compA = reqA.every(eq => have.includes(eq) || eq==='nei');
-          const compB = reqB.every(eq => have.includes(eq) || eq==='nei');
-          if (compA && !compB) return -1;
-          if (!compA && compB) return  1;
-          // sekundærsortering: færrest krav først
-          return reqA.length - reqB.length;
-        });
-      }
-
-      const html = list.map(w => `
+      const html = list.map(w => {
+        const reqEquip = getEquipForWorkout(w);
+        return `
         <div class="card">
           <div><strong>${w.name}</strong> <span class="small">${w.category} • ${w.focus_area}</span></div>
-          <div class="small">Utstyr: ${(getEquipForWorkout(w).join(', ') || 'nei')}</div>
+          <div class="small">Utstyr: ${(reqEquip.length ? reqEquip.join(', ') : 'nei')}</div>
           <div class="flex">
             <button class="button" data-start="${w.workout_id}">Start</button>
             <button class="button secondary" data-fav="${w.workout_id}">${w.favorite?'★ Favoritt':'☆ Merk favoritt'}</button>
             <button class="button secondary" data-edit="${w.workout_id}">Rediger</button>
+            <button class="button secondary" data-del="${w.workout_id}">Slett</button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
 
-      document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter. Importer eller lag i editor.</div>';
+      document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter som matcher filteret. Juster utstyr/kategori/fokus.</div>';
 
       // Handlers
       document.querySelectorAll('[data-start]').forEach(b => b.onclick = () => {
@@ -157,6 +154,15 @@ const Library = {
         const w = AppState.workouts.find(x=>x.workout_id===b.dataset.edit);
         Editor.render(w); setActive('editor');
       });
+      document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+        const wid = b.dataset.del;
+        const idx = AppState.workouts.findIndex(x=>x.workout_id===wid);
+        if (idx>=0 && confirm('Slette økta?')) {
+          AppState.workouts.splice(idx,1);
+          Store.save(Store.keys.workouts, AppState.workouts);
+          renderList();
+        }
+      });
     }
 
     // Init
@@ -164,7 +170,6 @@ const Library = {
     document.getElementById('filterFocus').onchange = renderList;
     document.getElementById('filterCat').onchange   = renderList;
     document.querySelectorAll('.eq-have').forEach(c => c.onchange = renderList);
-    document.getElementById('onlyCompatible').onchange = renderList;
   }
 };
 
