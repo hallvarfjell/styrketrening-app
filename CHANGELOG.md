@@ -10,7 +10,6 @@ GENERELT:
 
 DASHBOARD:
 - På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker at disse samles i en menyknapp (sånn med tre streker)
-- Endre logo (Jeg gjør dette selv etterpå)
 
 ØKTVELGER
 - Øktvelgeren må kunne sortere på hvilket utstyr jeg har tilgjengelig.
@@ -18,12 +17,12 @@ DASHBOARD:
 - Eksport øvelser er unødvendig da det ikke går an å redigere øvelser i appen.
 - Filteret i øktvelgeren finner ikke igjen alle eksempeløktene, men den filtrerer korrekt på øktene jeg selv har laget. Sannsynligvis feil i eksempeløktene.
 
-ØKTEDITOR
-- Jeg ønsker at modulen "Editor" kalles for Økteditor (Jeg kan sannsynligvis fikse dette selv i koden)
+EDITOR
 - Det skjer en feil med beskrivelsen når øvelsene importeres. Der beskrivelsen av øvelsen inneholder komma så tolker programmet det som at beskrivelsen er ferdig.
 - Drag-n-drop på økt og øvelsesimporten virker ikke
 - Tekst med kolonnenavn (exercise_id, name… etc) i økt- og øvelsesimporten er unødvendig. Fjern det.
 - Det går ikke an å bruke mellomromstasten i øktnavn i editor. Det går an å lime inn et mellomrom men dette er tungvint.
+- Jeg ønsker mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
 
 ØKTKJØRINGEN:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
