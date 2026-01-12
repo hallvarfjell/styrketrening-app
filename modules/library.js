@@ -1,33 +1,37 @@
 
-// Øktvelger: semikolon-CSV import/eksport, favoritter, dynamisk utstyrsfilter uten "nei" og uten "Vis kun passende",
-// alltid filtrert slik at bare økter som ikke krever utstyr eller krever utstyr som er valgt, vises.
-// Sletting av økter støttes.
+// Øktvelger:
+// - Utstyrsfilteret: dynamisk fra øvelser, ekskluderer 'nei' helt.
+// - Vis ALDRI økter som krever annet utstyr enn det som er avkrysset.
+//   (Hvis ingen utstyr er avkrysset → vis kun økter som ikke krever utstyr.)
+// - Nye økter øverst i lista (sortert på created_at desc; fallback på rekkefølge).
+// - Sletting av økter støttes.
+// - CSV (semikolon) med items separert av |. Eksport med UTF-8 BOM.
 
 const Library = {
   render(){
-    // Finn alle utstyrstyper som finnes i øvelsesbiblioteket (union), ekskluder 'nei'
+    // Bygg dynamisk utstyrsliste fra øvelsesbiblioteket (union), ekskluder 'nei'
     const equipmentSet = new Set();
-    (AppState.exercises || []).forEach(e => (e.equipment || []).forEach(eq => { if (eq && eq !== 'nei') equipmentSet.add(eq); }));
+    (AppState.exercises || []).forEach(e => (e.equipment || []).forEach(eq => {
+      if (eq && eq !== 'nei') equipmentSet.add(eq);
+    }));
     const allEquipment = Array.from(equipmentSet).sort();
 
     render(`
       <div class="card">
         <h2>Importer/eksporter økter (CSV)</h2>
         <div class="flex">
-          <div style="flex:1">
-            <input type="file" id="wkcsv" accept=".csv" />
-          </div>
+          <div style="flex:1"><input type="file" id="wkcsv" accept=".csv" /></div>
           <div style="flex:1; text-align:right">
             <button class="button" id="wkimport">Importer økter (CSV)</button>
             <button class="button secondary" id="exportWk">Eksporter økter (CSV)</button>
           </div>
         </div>
-        <div class="small">CSV er <strong>semikolondelt</strong>. Feltet <code>items</code> bruker <strong>|</strong> som separator (f.eks. <code>EX001:60|EX002:60</code>).</div>
+        <div class="small">CSV er <strong>semikolondelt</strong>. Feltet <code>items</code> bruker <strong>|</strong> mellom øvelser (f.eks. <code>EX001:60|EX002:60</code>).</div>
       </div>
 
       <div class="card">
         <h2>Utstyr jeg har tilgjengelig</h2>
-        <div class="flex">
+        <div class="flex" id="eqPanel">
           ${allEquipment.map(eq => `
             <label><input type="checkbox" class="eq-have" value="${eq}"> ${eq.charAt(0).toUpperCase()}${eq.slice(1)}</label>
           `).join(' ')}
@@ -71,11 +75,13 @@ const Library = {
           items: (r.items||'').split('|').map(pair => {
             const [eid, dur] = pair.split(':');
             return eid ? { exercise_id: eid.trim(), duration_sec: Number(dur||60) } : null;
-          }).filter(Boolean)
+          }).filter(Boolean),
+          // Sett created_at hvis finnes i CSV, ellers nå
+          created_at: Number(r.created_at || Date.now())
         }));
         Store.save(Store.keys.workouts, AppState.workouts);
         alert(`Importert ${AppState.workouts.length} økter.`);
-        renderList(); // oppdater visningen umiddelbart
+        renderList(); // oppdater visning
       };
       reader.readAsText(file);
     };
@@ -97,12 +103,12 @@ const Library = {
       const s = new Set();
       (w.items||[]).forEach(it => {
         const ex = AppState.exercises.find(e=>e.exercise_id===it.exercise_id);
-        (ex?.equipment||[]).forEach(eq => s.add(eq));
+        (ex?.equipment||[]).forEach(eq => { if (eq) s.add(eq); });
       });
       return Array.from(s);
     };
 
-    // Render liste med utstyrsfilter alltid aktivt
+    // Render liste med utstyrsfilter alltid aktivt + nye økter øverst
     function renderList(){
       const focus = document.getElementById('filterFocus').value;
       const cat   = document.getElementById('filterCat').value;
@@ -115,21 +121,23 @@ const Library = {
       if (cat)   list = list.filter(w=>w.category  ===cat);
 
       // Utstyrsfilter: alltid aktiv
-      // - Hvis selected er tom → vis kun økter som krever "nei" (dvs. ingen utstyr)
-      // - Ellers → vis økter der alle krav != 'nei' er subset av selected
+      // - Ingen avkrysset → vis økter som ikke krever utstyr (req==[])
+      // - Ellers → vis økter der alle req er subset av selected
       list = list.filter(w => {
-        const req = getEquipForWorkout(w);
-        const reqNoNei = req.filter(eq => eq !== 'nei');
-        if (selected.length === 0) return reqNoNei.length === 0;
-        return reqNoNei.every(eq => selected.includes(eq));
+        const req = getEquipForWorkout(w).filter(eq => eq !== 'nei'); // 'nei' finnes ikke lenger, men filtrer likevel
+        if (selected.length === 0) return req.length === 0;
+        return req.every(eq => selected.includes(eq));
       });
+
+      // Nye økter øverst: sortér på created_at desc (mangler -> 0)
+      list.sort((a,b) => (Number(b.created_at||0) - Number(a.created_at||0)));
 
       const html = list.map(w => {
         const reqEquip = getEquipForWorkout(w);
         return `
         <div class="card">
           <div><strong>${w.name}</strong> <span class="small">${w.category} • ${w.focus_area}</span></div>
-          <div class="small">Utstyr: ${(reqEquip.length ? reqEquip.join(', ') : 'nei')}</div>
+          <div class="small">Utstyr: ${reqEquip.length ? reqEquip.join(', ') : 'ingen'}</div>
           <div class="flex">
             <button class="button" data-start="${w.workout_id}">Start</button>
             <button class="button secondary" data-fav="${w.workout_id}">${w.favorite?'★ Favoritt':'☆ Merk favoritt'}</button>
@@ -139,7 +147,7 @@ const Library = {
         </div>`;
       }).join('');
 
-      document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter som matcher filteret. Juster utstyr/kategori/fokus.</div>';
+      document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter matcher filteret. Juster utstyr/kategori/fokus.</div>';
 
       // Handlers
       document.querySelectorAll('[data-start]').forEach(b => b.onclick = () => {
