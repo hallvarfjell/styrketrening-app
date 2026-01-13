@@ -29,7 +29,9 @@ DASHBOARD:
 - Legg nye økter øverst i lista
 
 - REV04:
-- Vil ha knapp for "Velg alle". 
+-  Filteret for "Utstyr jeg har tilgjengelig" fungerer ikkje særlig bra. Bytt ut check-boksene med en dropdown meny med flervalgsmulighet (der check-boksen slik den fungerer nå er i dropdownmenyen). "Velg alle" skal være ett av alternativene i dropdownmenyen.
+-   Under "Filtrer og velg økter" Må man finne igjen alle kategorier som finnes i øktene som er laget. Dersom man for eksempel har laget en økt og definert kategorien "Kontorstyrke" i editoren skal man også kunne finne igjen denne kategorien i dette filteret i øktvelgeren.
+-   La boksene for Import og Eksport av økter ligge ved siden av hverandre under filvelgerknappen istedet for stablet på høyre siden.
 
 EDITOR
 - Jeg ønsker at import- og eksportfunksjon av øvelser er i Editor-modulen. Jeg ønsker også mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
@@ -51,10 +53,26 @@ EDITOR
 -   Filter for RPE og lyd skal være en drop-down, der henholdsvis REP og Lydnivå står med grå skrift før verdi er valgt (for at brukeren skal forstå hva han filtrerer på). Verdiene i drop-down menyene skal være de samme som ligger i øvelsesbiblioteket.
 
 -   Rev04:
--   Tekstboksen for sortering av kategori fungerer tilsynelatende ikke. Jeg vil ha en drop-down meny slik som Fokus Boksen. Det kan stå "Kategori (alle)" der dersom den ikke blir brukt.
--   Sorteringsboksen for RPE fungerer tilsynelatende ikke. Den har en dropdown-meny men det er ingen andre verdier enn RPE der.
--   Redigeringsknapp på hver øvelse.
--   Filteret fungerer ikkje særlig bra. Filteret Kanskje heller ha en dropdown med multiple choice, inkl alle
+-  Endringer på "Filter øvelser"-feltet:
+-    Jeg vil at alle filter skal være slik som "Fokusområde", dvs en dropdown-meny med alternativer. Dersom filterboksen ikke benyttes skal filternavn og (alle) stå, slik som "Fokus (alle). Verdier for alternativene skal hentes fra øvelseslista (for RPE betyr dette Lett, moderat og hardt og for lydnivå betyr dette Lavt, medium, høyt). Det betyr også at dersom det for eksempel blir lagt til en ny kategori (enten ved import eller ved inntasting i "Legg til øvelse" feltet) skal denne kategorien også kunne filtreres på i dropdown-menyen for kategori. Det samme gjelder for Lydnivå, dersom en øvelse har lydnivå "stille". Filter for RPE må kunne akseptere Tekst. Nå leser den tilsynelatende bare tall. Filter for lydnivå fungerer bra.
+-    Filter for RPE og Lydnivå flyttes opp til å ligge under Fokusområde-filteret og Kategori-filteret.
+-    Filteret for "Utstyr jeg har tilgjengelig" fungerer ikkje særlig bra. Bytt ut check-boksene med en dropdown meny med flervalgsmulighet. "Velg alle" skal være ett av alternativene i dropdownmenyen. Selve filtreringen fungerer heller ikke. Dersom utstyr ikke er avmerket skal heller ikke øvelsen der dette utstyret er nødvendig vise. Dersom ingen boks er avmerket er det bare kroppsvektøvelser som skal vise. Vis teksten "Tilgjengelig utstyr" på knappen. Dersom intet utstyr er markert: Skriv "kun kroppsvekt" med diskret tekst under. Dersom noe utstyr er valgt skriv navnet på utstyret som er valgt med diskret tekst under, og ikke "kun kroppsvekt"
+-    Søkefeltet (Søk (navn/beskrivelse) fungerer bra. Plasser dette under alle dropdown-filtrene (før øvelseslisten)
+
+-   Øvelseslisten:
+-     Jeg vil ha en redigeringsknapp på hver øvelse. Ved trykk sendes øvelsen til "Legg til øvelse"-feltet slik at jeg kan redigere øvelsen der.
+-     "Slett øvelse" knappen skal slette øvelsen i selve øvelseslista, ikke økten som er under utarbeidelse i "Bygg økt" feltet.
+- Endringer i "Bygg økt"-feltet:
+-   Kategoriboksen: Skal ikke ha predefinert Styrke/Spenst som nå. Her skal det stå Kategori. Denne skal være dropdown med verdier fra øvelser som ligger i øvelseslisten, men det skal også være mulig å skrive inn en ny kategori.
+- Endringer i "Legg til øvelse"-feltet
+-   Boks for varighet: Skriv "60 sekund" istedet for "Default varighet (sek), men behold farge.
+-   Boks for RPE. Må være dropdown med alternativene Lav, Medium og Høy. Skriv "RPE (medium) med samme grå skrift og la øvelsen få RPE=medium dersom ingen verdi blir valgt.
+-   Boks for kategori. Denne skal være dropdown men det skal også være mulig å skrive inn en ny kategori. La teksten som står i tekstboksen være som nå.
+-   Boks for Fokusområde: Må være dropdown med alternativene som allerede finnes i øvelseslista. Typiske verdier, som det er per nå er "Hele kroppen", "Overkropp" og "Underkropp". Det skal også være mulig å skrive inn andre verdier, som for eksempel "Skuldre", "Armer", "Legg", etc. Skriv "Fokusområde" med grå skrift når knappen ikke er brukt
+-   Boks for utstyr. Må være dropdown med alternativene som allerede finnes i øvelseslista. Det skal også være mulig å skrive inn andre verdier. Skriv "Kun kroppsvekt" med grå skrift når knappen ikke er brukt. Ikke skriv noe på utstyr dersom denne boksen ikke fylles ut.
+-   Boks for støynivå. Må være dropdown med alternativene som allerede finnes i øvelseslista. Det skal også være mulig å skrive inn andre verdier. Skriv "Lydnivå" med grå skrift når knappen ikke er brukt. Ikke skriv noe på utstyr dersom denne boksen ikke fylles ut.
+- Endringer i "Øvelsesbibliotek"-feltet:
+-   La boksene for Import og Eksport av økter ligge ved siden av hverandre under filvelgerknappen istedet for stablet på høyre siden.
 
 ØKTKJØRINGEN:
 - Progressbar for hele økta er ferdig før siste øvelse er ferdig
