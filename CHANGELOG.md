@@ -3,16 +3,8 @@
 - v0.1.0: Grunnstruktur og eksempler.
 
 Endringer i funksjonalitet og bugfixes som prompt til neste iterasjon
-GENERELT:
-- Teit navn. Trenger nytt og bedre navn.
-- Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout?
-- Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
 
-DASHBOARD:
-- På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker at disse samles i en menyknapp (sånn med tre streker)
-- Jeg ønsker at alle økter som er merket som favoritt i øktvelger-modulen vises. Antall av siste økter som vises er tre.
-
-
+REV01
 ØKTVELGER
 - Det skjer en feil med beskrivelsen når øvelsene importeres. Der beskrivelsen av øvelsen inneholder komma så tolker programmet det som at beskrivelsen er ferdig. Jeg vil at CSV-filene som appen bruker skal være semikolondelt.
 - I øktvelger-modulen skal man kunne velge så mange favoritter man vil
@@ -20,26 +12,18 @@ DASHBOARD:
 - Eksport økter støtter tydeligvis ikke Æ, Ø eller Å. Må fikses.
 - Import- og eksportfunksjonen for øvelser flyttes til editor-modulen.
 
-- REV02
-- Utstyrsfilteret: Fjern boksen for "Nei". Fjern boksen for "Vis kun økter som passer for valgt utstyr". Listen over øvelser under "Filtrer og velg økt" skal til enhver tid bare vise øvelser som enten ikke krever utstyr eller der utstyret som kreves er avmerket. Dersom nytt utstyr blir tatt med når man lager en ny øvelse i Editor må dette utstyret komme med i filteret.
-- Det må gå an å slette økter.
-
-- REV03
-- Utstyrsfilteret: Fjern boksen for "Nei". JEg har fjernet "Nei" som utstyr i øvelseslista for å unngå forvirring.
-- Legg nye økter øverst i lista
-
-- REV04:
--  Filteret for "Utstyr jeg har tilgjengelig" fungerer ikkje særlig bra. Bytt ut check-boksene med en dropdown meny med flervalgsmulighet (der check-boksen slik den fungerer nå er i dropdownmenyen). "Velg alle" skal være ett av alternativene i dropdownmenyen.
--   Under "Filtrer og velg økter" Må man finne igjen alle kategorier som finnes i øktene som er laget. Dersom man for eksempel har laget en økt og definert kategorien "Kontorstyrke" i editoren skal man også kunne finne igjen denne kategorien i dette filteret i øktvelgeren.
--   La boksene for Import og Eksport av økter ligge ved siden av hverandre under filvelgerknappen istedet for stablet på høyre siden.
-
 EDITOR
 - Jeg ønsker at import- og eksportfunksjon av øvelser er i Editor-modulen. Jeg ønsker også mulighet for å kunne lage nye øvelser direkte i appen også. Lag et felt over listen over alle øvelsene, med lik utforming som den som bygger økta.
 - Jeg ønsker ikke ha progresjonstips som egen kolonne. Dette skal inkluderes i beskrivelsesteksten til øvelsen.
 - Fjerne tekst "Kolonner (øvelser): exercise_id,name,description,progression_tips,default_duration_sec,rpe,category,focus_area,equipment, etc" i feltet for "Importer øvelser (CSV) og økter (CSV)".
 - Det går ikke an å bruke mellomromstasten i øktnavn i editor.
--
--  REV02:
+
+REV02
+ØKTVELGER
+- Utstyrsfilteret: Fjern boksen for "Nei". Fjern boksen for "Vis kun økter som passer for valgt utstyr". Listen over øvelser under "Filtrer og velg økt" skal til enhver tid bare vise øvelser som enten ikke krever utstyr eller der utstyret som kreves er avmerket. Dersom nytt utstyr blir tatt med når man lager en ny øvelse i Editor må dette utstyret komme med i filteret.
+- Det må gå an å slette økter.
+
+EDITOR
 - Editormodulen består av fire felter, "Øvelsesbibliotek" med Import/Eksport-funksjon, "Legg til ny øvelse", "Filter øvelser" og "Bygg økt".
 -   "Filter øvelser"- feltet skal være til venstre på siden. Filteret må inkludere Utstyr, RPE og støynivå i tillegg til kategori og fokusområde. Man skal kunne huke av for alle typer utstyr som finnes i øvelsesbiblioteket. Det skal også være et søkefelt som søker i navn og beskrivelse.
 -   Til høyre i editor-modulen skal "Bygg økt" være øverst, under denne kommer "Legg til øvelse", og nederst i høyre kolonne kommer "Øvelsesbibliotek" med import/eksport-funksjon
@@ -47,12 +31,23 @@ EDITOR
 - Spesifikk varighet på en øvelse, slik den er definert i øvelsesbiblioteket, skal brukes. Standard varighet på 1 minutt brukes bare der spesifikk varighet mangler.
 - Det må gå an å slette øvelser
 
-- Rev03:
+REV03
+ØKTVELGER
+- Utstyrsfilteret: Fjern boksen for "Nei". JEg har fjernet "Nei" som utstyr i øvelseslista for å unngå forvirring.
+- Legg nye økter øverst i lista
+
+EDITOR
 -   Legg nye øvelser øverst i lista
 -   Knappen for å slette en øvelse skal virke på selve øvelsen i øvelsesoversikten. Slik den virker nå sletter den bare en øvelse i en økt som er under utarbeidelse.
 -   Filter for RPE og lyd skal være en drop-down, der henholdsvis REP og Lydnivå står med grå skrift før verdi er valgt (for at brukeren skal forstå hva han filtrerer på). Verdiene i drop-down menyene skal være de samme som ligger i øvelsesbiblioteket.
 
--   Rev04:
+REV04
+ØKTVELGER
+-  Filteret for "Utstyr jeg har tilgjengelig" fungerer ikkje særlig bra. Bytt ut check-boksene med en dropdown meny med flervalgsmulighet (der check-boksen slik den fungerer nå er i dropdownmenyen). "Velg alle" skal være ett av alternativene i dropdownmenyen.
+-   Under "Filtrer og velg økter" Må man finne igjen alle kategorier som finnes i øktene som er laget. Dersom man for eksempel har laget en økt og definert kategorien "Kontorstyrke" i editoren skal man også kunne finne igjen denne kategorien i dette filteret i øktvelgeren.
+-   La boksene for Import og Eksport av økter ligge ved siden av hverandre under filvelgerknappen istedet for stablet på høyre siden.
+
+EDITOR
 -  Endringer på "Filter øvelser"-feltet:
 -    Jeg vil at alle filter skal være slik som "Fokusområde", dvs en dropdown-meny med alternativer. Dersom filterboksen ikke benyttes skal filternavn og (alle) stå, slik som "Fokus (alle). Verdier for alternativene skal hentes fra øvelseslista (for RPE betyr dette Lett, moderat og hardt og for lydnivå betyr dette Lavt, medium, høyt). Det betyr også at dersom det for eksempel blir lagt til en ny kategori (enten ved import eller ved inntasting i "Legg til øvelse" feltet) skal denne kategorien også kunne filtreres på i dropdown-menyen for kategori. Det samme gjelder for Lydnivå, dersom en øvelse har lydnivå "stille". Filter for RPE må kunne akseptere Tekst. Nå leser den tilsynelatende bare tall. Filter for lydnivå fungerer bra.
 -    Filter for RPE og Lydnivå flyttes opp til å ligge under Fokusområde-filteret og Kategori-filteret.
@@ -74,13 +69,44 @@ EDITOR
 - Endringer i "Øvelsesbibliotek"-feltet:
 -   La boksene for Import og Eksport av økter ligge ved siden av hverandre under filvelgerknappen istedet for stablet på høyre siden.
 
+REV05
+ØKTVELGER
+- "Importer/eksporter økter (CSV)" feltet skal være nederst
+- "Tilgjengelig utstyr" trenger ikke ha et eget felt. "Tilgjengelig utstyr"-filterknappen kan være under "Fokusområde"-knappen og "Kategori"-knappen under "Filtrer og velg økter"-feltet.
+- Det skal  være et søkefelt som søker i navn
+- Jeg ønsker å ha en del predefinerte økter i programmet, som man ikke trenger å importere før man kan ta appen i bruk. Legg inn et område i koden der jeg kan lime inn økter fra en CSV-fil. Jeg ser at økter programmet eksporterer bruker exercise_id for å identifisere øvelser som skal være med i økta. Hvilke implikasjoner kan man få og hvordan kan disse løses? Jeg ønsker også å ha predefinerte øvelser i "Editoren" og disse kan godt samsvare med exercise_id-ene som bruker i de predefinerte øktene.
+
+EDITOR
+- Jeg ønsker at feltene bytter side, dvs at felt for #Bygg økt", "Legg til øvelse" og "Øvelsesbibliotek" er til venstre, mens felt for "Filter øvelser" er til høyre.
+- Endringer i "Bygg økt" feltet
+-   Legg inn mulighet til å sette varighet på pausene mellom øvelsene. Når økta kjører er det denne pauseverdien som gjelder
+- Endringer i "Legg til øvelse"-feltet:
+-   Boksen for RPE skal ligne på "Kategori"-boksen. Det skal stå "RPE" i grått men det skal bare kunne velges verdier som angitt under rpe i øvelsesbiblioteket, Lav, Medium eller Høy.
+-   Boksen for tid skal fungere som i dag, men det skal stå "Varighet (s)"
+-   Boksen for Lydnivå skal stå over "Tilgjengelig utstyr".
+- Endringer i "Filter øvelser"-feltet:
+-   Jeg ønsker som nevnt å ha predefinerte øvelser i "Editoren" og disse kan godt samsvare med exercise_id-ene som bruker i de predefinerte øktene.
+-   "Slett øvelse"-knappen som står på hver øvelse i øvelseslista skal slette selve øvelsen som knappen er på, på samme måte som at rediger-knappen redigerer øvelsen knappen står på.
+
 ØKTKJØRINGEN:
-- Progressbar for hele økta er ferdig før siste øvelse er ferdig
+- Øktnavn og beskrivelse av neste økt må stå under "Gjør deg klar!" mens pausen pågår.
 - Ønsker en nedtellingstidtaker både for den enkelte øvelsen (også pausen) og også en nedtellingstidtager for hele økta.
 - Når hele økta er ferdig kan "Avslutt og lagre"-knappen erstattes med en "Lagre"-knapp uten bekreftelse.
-- knapper for skipping av øvelser.
-- På telefonen stopper økta plutselig midt i en øvelse (progressbaren) og lar seg ikke starte igjen. Tida har likevel fortsatt å telle når man ser tidsforbruket i loggen.
+- Jeg vil ha knapper for skipping av øvelser. Man skal kunne bruke piltaster for dette som før. Start/Pause skal også aktiveres med "Enter"-tasten i tillegg til mellomromstasten.
 - Automatisk start når Startknapp i Øktvelger eller Dashboard trykkes.
+
+-------------------------
+REVXX
+GENERELT:
+- Teit navn. Trenger nytt og bedre navn.
+- Begrepsopprydning. Store bokstaver der det mangler. Puss.
+- Legge inn en del standardøvelser og økter i selve programmet
+- Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout?
+- Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
+
+DASHBOARD:
+- På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker at disse samles i en menyknapp (sånn med tre streker)
+- Jeg ønsker at alle økter som er merket som favoritt i øktvelger-modulen vises. Antall av siste økter som vises er tre.
 
 LOGG
 - Mer fantastisk statistikk og grafer på progresjon
