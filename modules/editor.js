@@ -1,17 +1,30 @@
 
 // modules/editor.js
-
-// Editor:
-// - VENSTRE: Bygg økt (inkl pause-min felt), Legg til øvelse (RPE = Lav/Medium/Høy, "Varighet (s)", Lydnivå over utstyr), Øvelsesbibliotek.
-// - HØYRE: Filter øvelser (dropdowns + flervalg for utstyr + søk).
-// - Predef øvelser kan limes i library.js (og/eller her senere om ønskelig); seeding skjer i Library når localStorage er tom.
-// - Slett øvelse-knapp fjerner øvelsen fra biblioteket og fra alle økter (samt pågående økt).
+//
+// Endringer:
+// - VENSTRE kolonne: Bygg økt (uten global pausefelt), Legg til øvelse (med ny "Varighet pause"),
+//   Øvelsesbibliotek (import/eksport).
+// - HØYRE kolonne: Filter øvelser (dropdowns + utstyr flervalg + søk).
+// - Bygg økt: Per-øvelse «Varighet (mm:ss)» og «Pause (s)» (default 10), små grå labels over feltene.
+// - Legg til øvelse: "Navn" feltet bredde som øvrige; "Varighet (s)" + "Varighet pause (s)".
+//   Rekkefølge-linjer: (1) Fokusområde + Kategori, (2) RPE + Lydnivå, (3) Tilgjengelig utstyr.
+//   RPE og Lydnivå er dropdown (ingen fritekst) – RPE = {Lav, Medium, Høy}, Lydnivå = verdier fra biblioteket.
+//   Validering: Navn, Beskrivelse, RPE, Kategori, Fokusområde, Lydnivå er obligatorisk (feilmelding).
+// - «Tilgjengelig utstyr»-hint i filteret oppdateres riktig (ikke alltid "kun kroppsvekt").
+// - Når øvelse legges til økt, brukes exercise.default_duration_sec (om finnes) og item.pause_after_sec = exercise.default_pause_sec (ellers 10).
+// - Øvelser kan slettes (fra biblioteket + fjernes fra ALLE økter + fra pågående økt).
+//
+// Datafelt som kan være nye:
+//   exercise.default_pause_sec (valgfritt; default 10)
+//   item.pause_after_sec       (per-øvelse pause i økta; default 10)
+//
+// NB: CSV-import av øvelser: om kolonnen "default_pause_sec" finnes, brukes den, ellers 10 ved nyoppretting.
 
 const Editor = {
   render(existing=null){
-    const w = existing || { workout_id:`WK${Date.now()}`, name:'', category:'', focus_area:'Hele kroppen', favorite:false, pause_between_items_sec:10, items:[], created_at: Date.now() };
+    const w = existing || { workout_id:`WK${Date.now()}`, name:'', category:'', focus_area:'Hele kroppen', favorite:false, items:[], created_at: Date.now() };
 
-    // Samle dynamiske oppslagslister fra øvelsesbiblioteket
+    // Slå opp dynamiske lister
     const eqSet    = new Set();
     const catSet   = new Set();
     const focusSet = new Set();
@@ -26,6 +39,7 @@ const Editor = {
     const allCategories= Array.from(catSet).sort((a,b)=>String(a).localeCompare(String(b)));
     const allFocus     = Array.from(focusSet).sort((a,b)=>String(a).localeCompare(String(b)));
     const allNoise     = Array.from(noiseSet).sort((a,b)=>String(a).localeCompare(String(b)));
+    const noiseOptions = allNoise.length ? allNoise : ['Lavt','Medium','Høyt'];
 
     render(`
       <div class="grid-2">
@@ -34,24 +48,21 @@ const Editor = {
           <!-- BYGG ØKT -->
           <div class="card">
             <h3>Bygg økt</h3>
-            <input id="name" class="input" placeholder="Øktnavn" value="${w.name}" />
-            <div class="flex">
-              <input id="cat" class="input" placeholder="Kategori" value="${w.category || ''}" list="categoryList" />
+            <input id="name" class="input" style="width:100%;" placeholder="Øktnavn" value="\${w.name}" />
+            <div class="flex" style="margin-top:8px;">
+              <input id="cat" class="input" placeholder="Kategori" value="\${w.category || ''}" list="categoryList" />
               <datalist id="categoryList">
                 ${allCategories.map(c=>`<option value="${c}">`).join('')}
               </datalist>
               <select id="focus" class="input">
-                ${allFocus.length ? allFocus.map(v=>`<option ${w.focus_area===v?'selected':''}>${v}</option>`).join('') : `
-                  <option ${w.focus_area==='Hele kroppen'?'selected':''}>Hele kroppen</option>
-                  <option ${w.focus_area==='Overkropp'?'selected':''}>Overkropp</option>
-                  <option ${w.focus_area==='Underkropp'?'selected':''}>Underkropp</option>`}
+                ${ (allFocus.length ? allFocus : ['Hele kroppen','Overkropp','Underkropp'])
+                    .map(v=>`<option ${w.focus_area===v?'selected':''}>${v}</option>`).join('') }
               </select>
             </div>
-            <div class="flex">
-              <input id="pauseSec" class="input" placeholder="Pause mellom øvelser (s)" value="${Number(w.pause_between_items_sec||10)}" />
-            </div>
-            <div id="items"></div>
-            <div class="flex">
+
+            <div id="items" style="margin-top:8px;"></div>
+
+            <div class="flex" style="margin-top:8px;">
               <button class="button" id="save">Lagre økt</button>
             </div>
           </div>
@@ -59,34 +70,39 @@ const Editor = {
           <!-- LEGG TIL ØVELSE -->
           <div class="card">
             <h3>Legg til øvelse</h3>
-            <input id="new_name"        class="input" placeholder="Navn" />
-            <textarea id="new_desc"     class="input" placeholder="Beskrivelse (inkl. progresjonstips om ønsket)"></textarea>
-            <div class="flex">
-              <input id="new_duration"  class="input" placeholder="Varighet (s)" />
-              <select id="new_rpe"      class="input">
+            <input id="new_name" class="input" style="width:100%;" placeholder="Navn" />
+            <textarea id="new_desc" class="input" placeholder="Beskrivelse (inkl. progresjonstips om ønsket)"></textarea>
+
+            <!-- Varighet + Varighet pause -->
+            <div class="flex" style="margin-top:8px;">
+              <input id="new_duration" class="input" placeholder="Varighet (s)" />
+              <input id="new_pause"    class="input" placeholder="Varighet pause (s)" />
+            </div>
+
+            <!-- Fokusområde + Kategori -->
+            <div class="flex" style="margin-top:8px;">
+              <input id="new_focus" class="input" placeholder="Fokusområde" list="focusList" />
+              <datalist id="focusList">
+                ${allFocus.map(f=>`<option value="${f}">`).join('')}
+              </datalist>
+              <input id="new_cat"   class="input" placeholder="Kategori" list="categoryList" />
+            </div>
+
+            <!-- RPE + Lydnivå -->
+            <div class="flex" style="margin-top:8px;">
+              <select id="new_rpe" class="input">
                 <option value="">RPE</option>
                 <option value="Lav">Lav</option>
                 <option value="Medium">Medium</option>
                 <option value="Høy">Høy</option>
               </select>
+              <select id="new_noise" class="input">
+                <option value="">Lydnivå</option>
+                ${noiseOptions.map(n=>`<option value="${n}">${n}</option>`).join('')}
+              </select>
             </div>
 
-            <div class="flex">
-              <input id="new_noise" class="input" placeholder="Lydnivå" list="noiseList" />
-              <datalist id="noiseList">
-                ${allNoise.map(n=>`<option value="${n}">`).join('')}
-              </datalist>
-            </div>
-
-            <div class="flex">
-              <input id="new_cat"   class="input" placeholder="Kategori" list="categoryList" />
-              <input id="new_focus" class="input" placeholder="Fokusområde" list="focusList" />
-              <datalist id="focusList">
-                ${allFocus.map(f=>`<option value="${f}">`).join('')}
-              </datalist>
-            </div>
-
-            <!-- Utstyr (multiselect dropdown + fritekst for nytt utstyr via enter) -->
+            <!-- Tilgjengelig utstyr -->
             <div class="multiselect" style="margin-top:8px;">
               <button id="newEqBtn" class="input">Tilgjengelig utstyr</button>
               <div id="newEqMenu" class="card" style="display:none; position:relative; z-index:5; max-width:520px;">
@@ -112,7 +128,7 @@ const Editor = {
               <button class="button" id="eximport">Importer øvelser (CSV)</button>
               <button class="button secondary" id="exportEx">Eksporter øvelser (CSV)</button>
             </div>
-            <div class="small">CSV er <strong>semikolondelt</strong>. Hvis kolonnen <code>progression_tips</code> finnes, appendes den til <code>description</code>.</div>
+            <div class="small">CSV er <strong>semikolondelt</strong>. Hvis kolonnen <code>progression_tips</code> finnes, appendes den til <code>description</code>. Valgfri kolonne: <code>default_pause_sec</code>.</div>
           </div>
         </div>
 
@@ -141,7 +157,7 @@ const Editor = {
               </select>
               <select id="fNoise" class="input">
                 <option value="">Lydnivå (alle)</option>
-                ${allNoise.map(v=>`<option value="${v}">${v}</option>`).join('')}
+                ${noiseOptions.map(v=>`<option value="${v}">${v}</option>`).join('')}
               </select>
             </div>
 
@@ -168,7 +184,7 @@ const Editor = {
 
     document.getElementById('focus').value = w.focus_area;
 
-    // ---- Ny øvelse: utstyr dropdown m/ flervalg + nytt utstyr ----
+    // --- Ny øvelse: utstyr flervalg + evt. nytt utstyr ---
     const newEqBtn  = document.getElementById('newEqBtn');
     const newEqMenu = document.getElementById('newEqMenu');
     const newEqHint = document.getElementById('newEqHint');
@@ -209,7 +225,7 @@ const Editor = {
       }
     };
 
-    // ---- Import/eksport av øvelser ----
+    // --- Import/eksport av øvelser (semikolon) ---
     document.getElementById('eximport').onclick = () => {
       const file = document.getElementById('excsv').files[0];
       if (!file) return alert('Velg øvelses-CSV');
@@ -224,14 +240,15 @@ const Editor = {
           const rpeNum = Number(r.rpe || NaN);
           const rpeText = r.rpe_text ? r.rpe_text
                         : Number.isFinite(rpeNum) ? (rpeNum<=3?'Lett':rpeNum<=6?'Moderat':'Hardt')
-                        : 'Moderat';
+                        : '';
           return {
             exercise_id:           r.exercise_id || `EX${Date.now()}`,
             name:                  r.name,
             description:           fullDesc,
             default_duration_sec:  Number(r.default_duration_sec || 60),
-            rpe:                   Number.isFinite(rpeNum) ? rpeNum : (rpeText==='Lett'?2:(rpeText==='Moderat'?5:8)),
-            rpe_text:              rpeText,
+            default_pause_sec:     Number(r.default_pause_sec || 10),
+            rpe:                   Number.isFinite(rpeNum) ? rpeNum : (rpeText==='Lett'?2:(rpeText==='Moderat'?5:(rpeText==='Hardt'?8:5))),
+            rpe_text:              rpeText || 'Moderat',
             category:              r.category || '',
             focus_area:            r.focus_area || 'Hele kroppen',
             equipment:             equipments,
@@ -240,34 +257,43 @@ const Editor = {
           };
         });
         Store.save(Store.keys.exercises, AppState.exercises);
-        alert(`Importert ${AppState.exercises.length} øvelser.`);
+        alert(\`Importert \${AppState.exercises.length} øvelser.\`);
         Editor.render(w);
       };
       reader.readAsText(file);
     };
 
     document.getElementById('exportEx').onclick = () => {
-      const headers = ['exercise_id','name','description','default_duration_sec','rpe','category','focus_area','equipment','noise_level'];
+      const headers = ['exercise_id','name','description','default_duration_sec','default_pause_sec','rpe','category','focus_area','equipment','noise_level'];
       const rows = AppState.exercises.map(e => [
-        e.exercise_id, e.name, e.description, e.default_duration_sec, e.rpe, e.category, e.focus_area, (e.equipment||[]).join(','), e.noise_level
+        e.exercise_id, e.name, e.description, e.default_duration_sec, (e.default_pause_sec ?? 10), e.rpe, e.category, e.focus_area, (e.equipment||[]).join(','), e.noise_level
       ]);
       const csv = Util.toCSV(headers, rows, ';');
       Util.download('exercises.csv', csv, 'text/csv');
     };
 
-    // ---- Legg til øvelse ----
+    // --- Legg til øvelse (med validering) ---
     document.getElementById('addExercise').onclick = () => {
       const name   = (document.getElementById('new_name').value || '').trim();
       const desc   = (document.getElementById('new_desc').value || '').trim();
-      const durVal = document.getElementById('new_duration').value.trim();
-      const rpeSel = document.getElementById('new_rpe').value; // Lav/Medium/Høy
-      const noise  = (document.getElementById('new_noise').value || '').trim();
-      const cat    = (document.getElementById('new_cat').value || '').trim();
-      const focus  = (document.getElementById('new_focus').value || '').trim();
-      if (!name) return alert('Navn mangler');
+      const durVal = (document.getElementById('new_duration').value || '').trim();
+      const pauseV = (document.getElementById('new_pause').value || '').trim();
+      const rpeSel = document.getElementById('new_rpe').value; // Lav/Medium/Høy (obligatorisk)
+      const noise  = (document.getElementById('new_noise').value || '').trim(); // (obligatorisk fra eksisterende)
+      const cat    = (document.getElementById('new_cat').value || '').trim();   // (obligatorisk)
+      const focus  = (document.getElementById('new_focus').value || '').trim(); // (obligatorisk)
+
+      const missing = [];
+      if (!name)  missing.push('Navn');
+      if (!desc)  missing.push('Beskrivelse');
+      if (!rpeSel) missing.push('RPE');
+      if (!cat)   missing.push('Kategori');
+      if (!focus) missing.push('Fokusområde');
+      if (!noise) missing.push('Lydnivå');
+      if (missing.length) return alert('Følgende mangler: ' + missing.join(', '));
 
       const rpeTextMap = { 'Lav':'Lett', 'Medium':'Moderat', 'Høy':'Hardt' };
-      const rpeText = rpeTextMap[rpeSel] || 'Moderat';
+      const rpeText = rpeTextMap[rpeSel];
       const rpeNum  = rpeText==='Lett' ? 2 : rpeText==='Moderat' ? 5 : 8;
 
       const equipArr = Array.from(newSelectedEquip);
@@ -277,12 +303,13 @@ const Editor = {
         name,
         description: desc,
         default_duration_sec: /^\d+$/.test(durVal) ? Number(durVal) : 60,
+        default_pause_sec:    /^\d+$/.test(pauseV) ? Number(pauseV) : 10,
         rpe: rpeNum,
         rpe_text: rpeText,
         category: cat,
-        focus_area: focus || 'Hele kroppen',
+        focus_area: focus,
         equipment: equipArr,
-        noise_level: noise || 'Medium',
+        noise_level: noise,
         created_at: Date.now()
       };
 
@@ -292,7 +319,7 @@ const Editor = {
       Editor.render(w);
     };
 
-    // ---- Filter for øvelser (høyre kolonne) ----
+    // --- Filter for øvelser (høyre kolonne) ---
     const fEqBtn  = document.getElementById('fEqBtn');
     const fEqMenu = document.getElementById('fEqMenu');
     const fEqHint = document.getElementById('fEqHint');
@@ -315,6 +342,7 @@ const Editor = {
       renderExercises();
     });
 
+    // Matcher for filter
     function matchesFilters(e){
       const fFocus  = document.getElementById('fFocus').value;
       const fCat    = document.getElementById('fCat').value;
@@ -333,7 +361,7 @@ const Editor = {
 
       const selected = Array.from(fSelectedEquip);
       const req = (e.equipment || []).filter(eq => eq !== 'nei');
-      if (!selected.length && req.length) return false;
+      if (!selected.length && req.length) return false;                // kroppsvekt-only når ikke valgt utstyr
       if (selected.length && !req.every(eq => selected.includes(eq))) return false;
 
       const txt = `${e.name||''} ${e.description||''}`.toLowerCase();
@@ -350,7 +378,7 @@ const Editor = {
         <div class="card">
           <div><strong>${e.name}</strong> <span class="small">${e.category||'(ingen kategori)'} • ${e.focus_area}</span></div>
           <div class="small">${(e.description||'').replace(/\n/g,'<br>')}</div>
-          <div class="flex">
+          <div class="flex" style="margin-top:6px;">
             <button class="button" data-add="${e.exercise_id}">Legg til i økt (${Number(e.default_duration_sec||60)}s)</button>
             <button class="button secondary" data-edit="${e.exercise_id}">Rediger</button>
             <button class="button secondary" data-del="${e.exercise_id}">Slett øvelse</button>
@@ -359,57 +387,76 @@ const Editor = {
       `).join('');
       document.getElementById('exlist').innerHTML = html || '<div class="card small">Ingen øvelser matcher filteret.</div>';
 
+      // Legg til i økt: bruk exercise.default_duration_sec og default_pause_sec
       document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
         const ex = AppState.exercises.find(x=>x.exercise_id===b.dataset.add);
-        const dur = Number(ex?.default_duration_sec || 60);
-        w.items.push({ exercise_id: ex.exercise_id, duration_sec: dur });
+        const dur   = Number(ex?.default_duration_sec || 60);
+        const pause = Number(ex?.default_pause_sec   || 10);
+        (w.items || (w.items=[])).push({ exercise_id: ex.exercise_id, duration_sec: dur, pause_after_sec: pause });
         renderItems();
       });
 
+      // Rediger -> fyll "Legg til øvelse"
       document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
         const ex = AppState.exercises.find(x=>x.exercise_id===b.dataset.edit);
         if (!ex) return;
-        document.getElementById('new_name').value    = ex.name || '';
-        document.getElementById('new_desc').value    = ex.description || '';
-        document.getElementById('new_duration').value= String(ex.default_duration_sec || 60);
-        const bucket = ex.rpe_text || (ex.rpe<=3?'Lett':ex.rpe<=6?'Moderat':'Hardt');
-        const revMap = { 'Lett':'Lav', 'Moderat':'Medium', 'Hardt':'Høy' };
-        document.getElementById('new_rpe').value     = revMap[bucket] || 'Medium';
-        document.getElementById('new_cat').value     = ex.category || '';
-        document.getElementById('new_focus').value   = ex.focus_area || 'Hele kroppen';
+        document.getElementById('new_name').value     = ex.name || '';
+        document.getElementById('new_desc').value     = ex.description || '';
+        document.getElementById('new_duration').value = String(ex.default_duration_sec || 60);
+        document.getElementById('new_pause').value    = String(ex.default_pause_sec  ?? 10);
+        document.getElementById('new_cat').value      = ex.category || '';
+        document.getElementById('new_focus').value    = ex.focus_area || '';
+        document.getElementById('new_rpe').value      = (ex.rpe_text==='Lett' ? 'Lav' : ex.rpe_text==='Moderat' ? 'Medium' : ex.rpe_text==='Hardt' ? 'Høy' : '');
+        document.getElementById('new_noise').value    = ex.noise_level || '';
+        // utstyr
         newSelectedEquip = new Set((ex.equipment||[]).filter(Boolean));
         document.querySelectorAll('.new-eq').forEach(cb => cb.checked = newSelectedEquip.has(cb.value));
         updateNewEquipHint();
-        document.getElementById('new_noise').value   = ex.noise_level || 'Medium';
         newEqMenu.style.display = 'block';
       });
 
+      // Slett øvelse (biblioteket + alle økter)
       document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
         const eid = b.dataset.del;
         const idx = AppState.exercises.findIndex(x=>x.exercise_id===eid);
         if (idx>=0 && confirm('Slette øvelsen?')) {
           AppState.exercises.splice(idx,1);
           Store.save(Store.keys.exercises, AppState.exercises);
-          AppState.workouts.forEach(W => {
+          // Fjern fra alle økter
+          (AppState.workouts||[]).forEach(W => {
             if (Array.isArray(W.items)) W.items = W.items.filter(it => it.exercise_id !== eid);
           });
           Store.save(Store.keys.workouts, AppState.workouts);
+          // Fjern også fra pågående
           w.items = (w.items||[]).filter(it => it.exercise_id !== eid);
           renderExercises();
           renderItems();
         }
       });
+
+      updateFilterEquipHint(); // <- viktig: oppdater teksten under filter-knappen
     }
 
     function renderItems(){
       const html = (w.items||[]).map((it, idx) => {
-        const e = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
-        const name = e?e.name:it.exercise_id;
+        const ex = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
+        const name = ex ? ex.name : it.exercise_id;
+        const dur  = Number(it.duration_sec || ex?.default_duration_sec || 60);
+        const pause= Number(it.pause_after_sec ?? ex?.default_pause_sec ?? 10);
         return `
           <div class="card">
             <div><strong>${name}</strong></div>
             <div class="flex">
-              <input class="input" value="${Util.fmtMMSS(it.duration_sec)}" data-dur="${idx}" />
+              <div style="flex:1;">
+                <div class="small" style="color:#666; margin-bottom:4px;">Varighet (mm:ss)</div>
+                <input class="input" value="${Util.fmtMMSS(dur)}" data-dur="${idx}" />
+              </div>
+              <div style="flex:1;">
+                <div class="small" style="color:#666; margin-bottom:4px;">Pause (s)</div>
+                <input class="input" value="${pause}" data-pause="${idx}" />
+              </div>
+            </div>
+            <div class="flex" style="margin-top:8px;">
               <button class="button secondary" data-up="${idx}">▲</button>
               <button class="button secondary" data-down="${idx}">▼</button>
               <button class="button secondary" data-del="${idx}">Fjern</button>
@@ -418,9 +465,15 @@ const Editor = {
         `;
       }).join('');
       document.getElementById('items').innerHTML = html || '<div class="card small">Ingen øvelser i økta ennå.</div>';
+
       document.querySelectorAll('[data-dur]').forEach(inp => inp.onchange = () => {
         const i = Number(inp.dataset.dur);
         w.items[i].duration_sec = Util.parseMMSS(inp.value);
+      });
+      document.querySelectorAll('[data-pause]').forEach(inp => inp.onchange = () => {
+        const i = Number(inp.dataset.pause);
+        const v = Number(inp.value);
+        w.items[i].pause_after_sec = Number.isFinite(v) ? v : 10;
       });
       document.querySelectorAll('[data-up]').forEach(b => b.onclick = () => {
         const i = Number(b.dataset.up);
@@ -436,7 +489,7 @@ const Editor = {
       });
     }
 
-    // Init/handlers
+    // Init og filter-handlere
     renderExercises(); renderItems();
 
     document.getElementById('fFocus').onchange = renderExercises;
@@ -445,16 +498,14 @@ const Editor = {
     document.getElementById('fNoise').onchange = renderExercises;
     document.getElementById('fSearch').oninput = renderExercises;
 
-    // Lagre økt (+ pause mellom øvelser fra feltet)
+    // Lagre økt (per-øvelse pauser er nå i items[*].pause_after_sec)
     document.getElementById('save').onclick = () => {
       w.name       = document.getElementById('name').value || 'Ny økt';
       w.category   = document.getElementById('cat').value || '';
       w.focus_area = document.getElementById('focus').value || 'Hele kroppen';
-      const p = Number(document.getElementById('pauseSec').value || 10);
-      w.pause_between_items_sec = Number.isFinite(p) ? p : 10;
       if (!w.created_at) w.created_at = Date.now();
 
-      // Beregn (utstyr, lydnivå, RPE, total tid)
+      // Beregn summer
       const equipSet = new Set(); let rpeSum=0, rpeCount=0; const noiseLevels={Low:1,Medium:2,High:3}; let noiseMax=1;
       (w.items||[]).forEach(it => {
         const e = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
@@ -464,15 +515,17 @@ const Editor = {
           noiseMax = Math.max(noiseMax, noiseLevels[e.noise_level||'Medium']||2);
         }
       });
+      const totalWork = (w.items||[]).reduce((a,b)=>a+(Number(b.duration_sec)||0),0);
+      const totalPause= (w.items||[]).reduce((a,b,i)=>a+(i<w.items.length-1 ? Number(b.pause_after_sec ?? 10) : 0),0);
       w.computed = {
-        total_time_sec: (w.items||[]).reduce((a,b)=>a+b.duration_sec,0) + ((w.items||[]).length-1)*w.pause_between_items_sec,
+        total_time_sec: totalWork + totalPause + (w.items?.length? (w.items[0].pause_after_sec ?? 10) : 0), // inkluder "gjør deg klar" før første
         equipment: Array.from(equipSet),
         noise_level: noiseMax===3?'High':(noiseMax===2?'Medium':'Low'),
         rpe_avg: rpeCount ? (rpeSum/rpeCount) : 5
       };
 
       const idx = AppState.workouts.findIndex(x=>x.workout_id===w.workout_id);
-      if (idx>=0) AppState.workouts[idx] = w; else AppState.workouts.unshift(w); // nye økter øverst
+      if (idx>=0) AppState.workouts[idx] = w; else AppState.workouts.unshift(w);
       Store.save(Store.keys.workouts, AppState.workouts);
       alert('Økt lagret.');
       Library.render(); setActive('library');
@@ -481,3 +534,4 @@ const Editor = {
 };
 
 window.Editor = Editor;
+``
