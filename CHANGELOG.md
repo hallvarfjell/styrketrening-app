@@ -119,12 +119,25 @@ LOGG
 - Jeg vil ha mer statistikk og grafer på progresjon. Gjerne presentert som stolpediagram per dag de siste syv dager. Kom med forslag på hvordan dette kan se ut. Det skal være motiverende.
 
 REV07 (ikkje kjørt)
-Dashboard
-- Tre-strekersmenyen skal være i det øverste feltet, på linje med logoen, ikke under i hovedmenyen. Tilstedeværelsen av denne menyknappen er dynamisk og skal kun komme som erstatning for de andre modulknappene når det ikke er plass til disse
+DASHBOARD
+- Tre-strekersmenyen (Hamburgermenyen) skal være i det øverste feltet, på linje med logoen, ikke under i dashboardmodulen. Tilstedeværelsen av denne menyknappen er dynamisk og skal kun komme som erstatning for de andre modulknappene når det ikke er plass til disse på skjermen appen vises på.
 - Fjern overskriften "Dashboard". Det står jo allerede i menyen.
 
+ØKTKJØRING (SESSION)
+- "Stopp og Lagre"-knapp. Bekreftelse "Stoppe og lagre økta" dersom denne trykkes før økta er ferdig.
+
+EDITOR
+I "Bygg økt"-feltet:
+-   Tekstboksen for Øktnavn bredere enn selve feltet. Juster slik at teksboksen passer.
+I "Legg til øvelse"-feltet:
+- I dropdownmenyen til Lydnivå skal verdiene være i rekkefølgen Lavt-Medium-Høyt
+- Bytt ut "RPE" med Intensitet overalt. Valgalternativene skal være Lav-Middels-Høy. Jeg endrer tilsvarende i CSV-filene.
+- Tekstboksen for Navn og BEskrivelse er bredere enn selve feltet. Juster slik at teksboksene passer.
+I "Filter øvelser"-feltet:
+- I dropdownmenyen til "Lydnivå (alle)" skal verdiene være i rekkefølgen Lavt-Medium-Høyt
 LOGG
 - Progresjonsgrafen må angi verdi på antall minutter på loddrett akse. Den skaleres for god visuell presentasjon. De siste syv ukedager på den horisontale aksen angis i formatet "Ukedag DATO, eksempelvis "Onsdag 14.
+- Sett inn klokkeslett for når økta ble kjørt før øktnavnet i loggfeltet.
   
 -------------------------
 REVXX
@@ -138,3 +151,8 @@ GENERELT:
 
 
 SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
+
+Videre arbeid:
+- Tilkobling pulsbelte
+- Forhåndsdefinerte kategorier?
+- RPE på øvelsesvelgeren
