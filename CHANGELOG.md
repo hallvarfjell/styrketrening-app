@@ -124,7 +124,8 @@ Dashboard
 - Fjern overskriften "Dashboard". Det står jo allerede i menyen.
 
 LOGG
-- Progresjonsgrafen skal ha antall minutter på loddrett akse og de siste syv ukedager på den horisontale aksen. Dagen i dag er lengst til høyre.
+- Progresjonsgrafen må angi verdi på antall minutter på loddrett akse. Den skaleres for god visuell presentasjon. De siste syv ukedager på den horisontale aksen angis i formatet "Ukedag DATO, eksempelvis "Onsdag 14.
+  
 -------------------------
 REVXX
 GENERELT:
