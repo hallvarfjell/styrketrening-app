@@ -95,6 +95,29 @@ EDITOR
 - Jeg vil ha knapper for skipping av øvelser. Man skal kunne bruke piltaster for dette som før. Start/Pause skal også aktiveres med "Enter"-tasten i tillegg til mellomromstasten.
 - Automatisk start når Startknapp i Øktvelger eller Dashboard trykkes.
 
+REV06
+EDITOR:
+- I "Bygg økt"-feltet
+-   Tekstboksen for Øktnavn bredere enn selve feltet. La den ha like stor avstand til rammen av feltet som de andre boksene.
+-   Fjern pausefeltet der det er nå. Jeg ønsker å kunne legge inn pause per øvelse. Skriv "Varighet (mm:ss)" med liten grå skrift over varighet-feltet, og "Pause (s)", med liten grå skrift over et pause-felt ved siden av. Grå, forhåndsutfylt verdi på 10.
+- I "Legg til øvelse"-feltet
+-   Tekstboksen for Navn bredere enn selve feltet. La den ha like stor avstand til rammen av feltet som de andre boksene.
+-   Legg til "Varighet pause" ved siden av boks for varighet øvelse med samme design og funksjon som denne. Default verdi på denne om ingenting fylles inn skal være 10 sekund.
+-   Rekkefølgen på etterfølgede bokser er: Fokusområde og Kategori på neste linje, og RPE og Lydnivå på neste. Tilgjengelig utstyr kommer til slutt i feltet slik som nå. Boksen lydnivå skal fungere som RPE, dvs uten fritekstmulighet men bare valg mellom verdier som finnes i øvelsesbiblioteket.
+- I "Filter øvelser"-feltet må den grå teksten under filterknappen (der det står "kun kroppsvekt") gjenspeile hvilet utstyr det er huket av på. Nå står det alltid "kun kroppsvekt", selv om det er huket av for utstyr, og dette er feil. "Tilgjengelig utstyr"-knappen i "Legg til øvelse"-feltet fungerer som den skal og kan brukes som mal.
+- Jeg vil ikke ha automatisk utfylt verdi på rpe, lydnivå og fokusområde dersom disse verdiene ikke blir angitt når øvelsen lages. Gi feilmelding på hva som mangler dersom Navn, Beskrivelse, rpe, Kategori, Fokusområde og/eller Lydnivå mangler.
+
+DASHBOARD:
+- På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker i slike tilfeller at alle knappene samles i en menyknapp (sånn med tre streker)
+- Jeg ønsker at alle økter som er merket som favoritt i øktvelger-modulen vises. Antall av siste økter som vises er tre.
+- Autostart av økt når man trykker start økt.
+
+ØKTKJØRING:
+- Tekst på startknappen skal være "Pause" når økta er i gang, og "Gjenoppta" når økta er pausa. Legg inn lite grå tekst om at Enter/mellomromstast pauser/gjenopptar økta og at piltaster veksler mellom øvelser.
+
+LOGG
+- Jeg vil ha mer statistikk og grafer på progresjon. Gjerne presentert som stolpediagram per dag de siste syv dager. Kom med forslag på hvordan dette kan se ut. Det skal være motiverende.
+- 
 -------------------------
 REVXX
 GENERELT:
@@ -103,13 +126,7 @@ GENERELT:
 - Legge inn en del standardøvelser og økter i selve programmet
 - Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout?
 - Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
+- Rollover med humoristisk tekst, trenings og eller triatlonrelatert.
 
-DASHBOARD:
-- På mobilversjonen er det ikke plass til knapper for alle modulene. Ønsker at disse samles i en menyknapp (sånn med tre streker)
-- Jeg ønsker at alle økter som er merket som favoritt i øktvelger-modulen vises. Antall av siste økter som vises er tre.
-
-LOGG
-- Mer fantastisk statistikk og grafer på progresjon
-- Må kunne lagre og importere loggen, eventuelt lagre den i en sky.
 
 SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
