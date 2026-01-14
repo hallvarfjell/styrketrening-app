@@ -1,8 +1,3 @@
-// I Dashboard-render der du starter en økt:
-AppState.currentWorkout = workout;
-AppState.autostart = true;     // <-- legg til denne
-Session.render();
-setActive('none');
 
 const Dashboard = {
   render(){
