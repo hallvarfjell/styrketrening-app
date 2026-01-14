@@ -117,7 +117,14 @@ DASHBOARD:
 
 LOGG
 - Jeg vil ha mer statistikk og grafer på progresjon. Gjerne presentert som stolpediagram per dag de siste syv dager. Kom med forslag på hvordan dette kan se ut. Det skal være motiverende.
-- 
+
+REV07 (ikkje kjørt)
+Dashboard
+- Tre-strekersmenyen skal være i det øverste feltet, på linje med logoen, ikke under i hovedmenyen. Tilstedeværelsen av denne menyknappen er dynamisk og skal kun komme som erstatning for de andre modulknappene når det ikke er plass til disse
+- Fjern overskriften "Dashboard". Det står jo allerede i menyen.
+
+LOGG
+- Progresjonsgrafen skal ha antall minutter på loddrett akse og de siste syv ukedager på den horisontale aksen. Dagen i dag er lengst til høyre.
 -------------------------
 REVXX
 GENERELT:
