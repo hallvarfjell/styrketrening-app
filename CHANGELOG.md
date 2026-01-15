@@ -129,7 +129,7 @@ DASHBOARD
 - GJØR DENNE DELEN MER SEXY. DET ER JO TROSS ALT DENNE SOM ER MEST SYNLIG.
 
 ØKTVELGER
-- Gi favorittknappen en annen farge når den er valgt. Gjerne rosa. Stjernen i knappen kan også være litt større.
+- Gi favorittknappen en annen farge når den er valgt. Gjerne rosa.
 - Legg inn en økt i koden
 - "Fokusområde (alle)"-knappen skal være dropdown (som i dag) men inkludere alle verdier for fokusområde fra øvelser som ligger i øvelseslisten (under kolonnen focus_area)
 
@@ -145,6 +145,7 @@ I "Legg til øvelse"-feltet:
 I "Filter øvelser"-feltet:
 - I dropdownmenyen til "Lydnivå (alle)" skal verdiene være i rekkefølgen Lavt-Medium-Høyt
 - Eksportere og importere per‑øvelse pause i exercices.CSV også (ekstra felt)
+  
 LOGG
 - Progresjonsgrafen må angi verdi på antall minutter på loddrett akse. Den skaleres for god visuell presentasjon. De siste syv ukedager på den horisontale aksen angis i formatet "Ukedag DATO, eksempelvis "Onsdag 14.
 - Sett inn klokkeslett for når økta ble kjørt før øktnavnet i loggfeltet.
