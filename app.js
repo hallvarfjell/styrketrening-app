@@ -26,8 +26,7 @@ const Util = {
     const rows = [];
     for (let i=1; i<lines.length; i++){
       const cols = Util._parseCSVLine(lines[i], delimiter);
-      const obj = {};
-      headers.forEach((h, idx) => obj[h] = (cols[idx] ?? '').trim());
+      const obj = {}; headers.forEach((h, idx) => obj[h] = (cols[idx] ?? '').trim());
       rows.push(obj);
     }
     return rows;
@@ -40,8 +39,7 @@ const Util = {
       else if (ch === delimiter && !inQuotes){ result.push(cur); cur=''; }
       else cur+=ch;
     }
-    result.push(cur);
-    return result;
+    result.push(cur); return result;
   },
   toCSV(headers, rows, delimiter=';'){
     const esc = (val) => {
@@ -61,31 +59,28 @@ function setActive(route){
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.route===route));
 }
 function navigate(route){
-  window.onkeydown = null; // nullstill globale snarveier fra session
+  window.onkeydown = null;
   AppState.currentRoute = route;
   setActive(route);
   if (route === 'dashboard') Dashboard.render();
   if (route === 'library')   Library.render();
   if (route === 'editor')    Editor.render();
   if (route === 'log')       Log.render();
-  // Lukk hamburger-panel
-  const panel = document.getElementById('hamburgerPanel'); if (panel) panel.style.display='none';
+  const menu = document.getElementById('hamburgerMenu'); if (menu) menu.style.display='none';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Toppmeny knapper
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.route));
-  });
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
 
-  // Hamburger
-  const hBtn = document.getElementById('hamburgerBtn');
-  const hPanel = document.getElementById('hamburgerPanel');
-  if (hBtn && hPanel){
-    hBtn.onclick = () => {
-      hPanel.style.display = (hPanel.style.display === 'none' ? 'block' : 'none');
-    };
-    hPanel.querySelectorAll('[data-route]').forEach(b => b.onclick = () => navigate(b.dataset.route));
+  // Hamburgermeny
+  const hBtn  = document.getElementById('hamburgerBtn');
+  const hMenu = document.getElementById('hamburgerMenu');
+  if (hBtn && hMenu) {
+    hBtn.onclick = () => { hMenu.style.display = (hMenu.style.display === 'none' ? 'block' : 'none'); };
+    hMenu.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.route)));
+    document.addEventListener('click', (e) => {
+      if (!hMenu.contains(e.target) && !hBtn.contains(e.target)) { hMenu.style.display = 'none'; }
+    });
   }
 
   Dashboard.render();
