@@ -10,16 +10,29 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo2.png" alt="Logo2" />
+      <img src="assets/logo.png" alt="Logo" />
       <span>Styrketrening</span>
     </div>
-    <nav class="nav">
+
+    <!-- NAV-BUTTONS (skjules på smal skjerm) -->
+    <nav class="nav" id="mainNav">
       <button data-route="dashboard" class="nav-btn active">Dashboard</button>
       <button data-route="library" class="nav-btn">Øktvelger</button>
       <button data-route="editor" class="nav-btn">Editor</button>
       <button data-route="log" class="nav-btn">Logg</button>
     </nav>
+
+    <!-- HAMBURGER (vises når nav skjules) -->
+    <button id="hamburgerBtn" class="hamburger" aria-label="Meny">☰</button>
   </header>
+
+  <!-- Mobilmeny-panel -->
+  <div id="hamburgerPanel" class="hamburger-panel" style="display:none;">
+    <button data-route="dashboard" class="menu-item">Dashboard</button>
+    <button data-route="library" class="menu-item">Øktvelger</button>
+    <button data-route="editor" class="menu-item">Editor</button>
+    <button data-route="log" class="menu-item">Logg</button>
+  </div>
 
   <main id="app" class="container"></main>
 
