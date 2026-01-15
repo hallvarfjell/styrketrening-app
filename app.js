@@ -58,16 +58,26 @@ function render(html){ document.getElementById('app').innerHTML = html; }
 function setActive(route){
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.route===route));
 }
+
 function navigate(route){
   window.onkeydown = null;
   AppState.currentRoute = route;
   setActive(route);
-  if (route === 'dashboard') Dashboard.render();
-  if (route === 'library')   Library.render();
-  if (route === 'editor')    Editor.render();
-  if (route === 'log')       Log.render();
-  const menu = document.getElementById('hamburgerMenu'); if (menu) menu.style.display='none';
+
+  try {
+    if (route === 'dashboard') Dashboard.render();
+    if (route === 'library')   Library.render();
+    if (route === 'editor')    Editor.render();
+    if (route === 'log')       Log.render();
+  } catch (err) {
+    console.error('Feil ved navigering til', route, err);
+    alert('Det oppstod en feil ved åpning av ' + route + '.\nSe Console (F12) for detaljer.\n\n' + (err && err.message ? err.message : err));
+  }
+
+  const menu = document.getElementById('hamburgerMenu'); 
+  if (menu) menu.style.display='none';
 }
+
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
