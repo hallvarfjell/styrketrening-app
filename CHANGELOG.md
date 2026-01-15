@@ -118,23 +118,33 @@ DASHBOARD:
 LOGG
 - Jeg vil ha mer statistikk og grafer på progresjon. Gjerne presentert som stolpediagram per dag de siste syv dager. Kom med forslag på hvordan dette kan se ut. Det skal være motiverende.
 
-REV07 (ikkje kjørt)
+REV07
 DASHBOARD
-- Tre-strekersmenyen (Hamburgermenyen) skal være i det øverste feltet, på linje med logoen, ikke under i dashboardmodulen. Tilstedeværelsen av denne menyknappen er dynamisk og skal kun komme som erstatning for de andre modulknappene når det ikke er plass til disse på skjermen appen vises på.
+- Tre-strekersmenyen (Hamburgermenyen) skal være i det øverste feltet, på linje med logoen, ikke under i dashboardmodulen. Tilstedeværelsen av denne menyknappen er dynamisk og skal kun komme som erstatning for de andre modulknappene når det ikke er plass til disse på skjermen appen vises på. Endringe må kanskje gjøres i index.html?
 - Fjern overskriften "Dashboard". Det står jo allerede i menyen.
 
 ØKTKJØRING (SESSION)
-- "Stopp og Lagre"-knapp. Bekreftelse "Stoppe og lagre økta" dersom denne trykkes før økta er ferdig.
+- Legg til en "Lagre"-knapp. Bekreftelse "Stoppe og lagre økta" dersom denne trykkes før økta er ferdig.
+- Bedre nedtellingstidtaker.
+- GJØR DENNE DELEN MER SEXY. DET ER JO TROSS ALT DENNE SOM ER MEST SYNLIG.
+
+ØKTVELGER
+- Gi favorittknappen en annen farge når den er valgt. Gjerne rosa. Stjernen i knappen kan også være litt større.
+- Legg inn en økt i koden
+- "Fokusområde (alle)"-knappen skal være dropdown (som i dag) men inkludere alle verdier for fokusområde fra øvelser som ligger i øvelseslisten (under kolonnen focus_area)
 
 EDITOR
 I "Bygg økt"-feltet:
 -   Tekstboksen for Øktnavn bredere enn selve feltet. Juster slik at teksboksen passer.
+-   Bytt plass på Kategori-boksen og Fokusområde-boksen. La fokusområde-boksen se ut på samme måte som Kategori-boksen, dvs at "Fokusområde" står med grå skrift, og når man trykker på den kommer alternativene i dropdownmenyen (med alle verdier for fokusområde slik de er i øktbiblioteket) opp.
+-   Drag/drop funksjonalitet for å endre rekkefølge på øvelser.
 I "Legg til øvelse"-feltet:
 - I dropdownmenyen til Lydnivå skal verdiene være i rekkefølgen Lavt-Medium-Høyt
 - Bytt ut "RPE" med Intensitet overalt. Valgalternativene skal være Lav-Middels-Høy. Jeg endrer tilsvarende i CSV-filene.
 - Tekstboksen for Navn og BEskrivelse er bredere enn selve feltet. Juster slik at teksboksene passer.
 I "Filter øvelser"-feltet:
 - I dropdownmenyen til "Lydnivå (alle)" skal verdiene være i rekkefølgen Lavt-Medium-Høyt
+- Eksportere og importere per‑øvelse pause i exercices.CSV også (ekstra felt)
 LOGG
 - Progresjonsgrafen må angi verdi på antall minutter på loddrett akse. Den skaleres for god visuell presentasjon. De siste syv ukedager på den horisontale aksen angis i formatet "Ukedag DATO, eksempelvis "Onsdag 14.
 - Sett inn klokkeslett for når økta ble kjørt før øktnavnet i loggfeltet.
@@ -145,10 +155,12 @@ GENERELT:
 - Teit navn. Trenger nytt og bedre navn.
 - Begrepsopprydning. Store bokstaver der det mangler. Puss.
 - Legge inn en del standardøvelser og økter i selve programmet
-- Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout?
+- Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout? (be om å oppdatere style.css)
 - Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
 - Rollover med humoristisk tekst, trenings og eller triatlonrelatert.
 
+EDITOR:
+Mulighet til å legge inn flere sett. Kopieringsfunksjon av øvelser og hele sett og mulighet for å legge inn seriepause.
 
 SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
 
