@@ -5,14 +5,24 @@ const Session = {
   timer: null,
   state: null,
   audioCtx: null,
+  audioUnlocked: false,
+
+  _ensureAudio(){
+    try{
+      if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+      this.audioUnlocked = true;
+    }catch(e){/* no-op */}
+  },
 
   _ding(){
     try{
-      if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const ctx = this.audioCtx;
+      if (!this.audioUnlocked) return; // venter på første brukerklikk
+      const ctx = this.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      this.audioCtx = ctx;
       const o = ctx.createOscillator();
       const g = ctx.createGain();
-      o.type = 'sine'; o.frequency.value = 880; // A5
+      o.type = 'sine'; o.frequency.value = 880;
       g.gain.value = 0.0001;
       o.connect(g); g.connect(ctx.destination);
       o.start();
@@ -20,7 +30,7 @@ const Session = {
       g.gain.exponentialRampToValueAtTime(0.2, now + 0.01);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.20);
       o.stop(now + 0.21);
-    }catch(e){ /* lyd ikke kritisk */ }
+    }catch(e){}
   },
 
   render() {
@@ -42,18 +52,46 @@ const Session = {
       return work + pauses + preStart;
     })();
 
-    this.state = {
-      idx: -1, phase: 'pause',
-      remainingInPhase: (w.items && w.items.length ? getPauseAfter(-1) : 10),
-      remainingTotal: totalPlanned,
-      running: false
+    // Beregn gjenværende total-tid gitt nåværende state
+    const computeRemainingTotal = () => {
+      let rem = 0;
+      // gjenværende i nåværende fase
+      rem += Math.max(0, this.state?.remainingInPhase || 0);
+
+      if (!w.items || !w.items.length) return rem;
+
+      if (this.state.phase === 'pause') {
+        const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx + 1);
+        for (let i = nextIdx; i < w.items.length; i++) {
+          rem += Number(w.items[i].duration_sec)||0;
+          if (i < w.items.length - 1) rem += getPauseAfter(i);
+        }
+      } else if (this.state.phase === 'work') {
+        // pause etter nåværende (om ikke siste)
+        if (this.state.idx < w.items.length - 1) rem += getPauseAfter(this.state.idx);
+        // resterende øvelser + pauser
+        for (let i = this.state.idx + 1; i < w.items.length; i++) {
+          rem += Number(w.items[i].duration_sec)||0;
+          if (i < w.items.length - 1) rem += getPauseAfter(i);
+        }
+      }
+      return rem;
     };
 
-    // Stakket layout: først session-kort, så liste under
+    this.state = {
+      idx: -1,
+      phase: 'pause',
+      remainingInPhase: (w.items && w.items.length ? getPauseAfter(-1) : 10),
+      remainingTotal: 0, // settes under
+      running: false
+    };
+    this.state.remainingTotal = computeRemainingTotal();
+
     render(
       '<div>' +
         '<div id="sessionWrap" class="card session-card pause">' +
-          '<div id="status" class="session-status">Neste:</div>' +
+          // Stor status med linjeskift og fet navn
+          '<div id="status" class="session-title">Neste:<br><strong></strong></div>' +
           '<div id="details" class="session-details small"></div>' +
 
           '<div class="card">' +
@@ -107,34 +145,35 @@ const Session = {
       return 1;
     };
 
+    const setStatus = () => {
+      const el = document.getElementById('status');
+      if (this.state.phase === 'pause') {
+        const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
+        const next = w.items[nextIdx];
+        const e = next ? AppState.exercises.find(x=>x.exercise_id===next.exercise_id) : null;
+        el.innerHTML = 'Neste:<br><strong>' + (next ? (e?e.name:next.exercise_id) : '') + '</strong>';
+        const desc = e?.description || '';
+        document.getElementById('details').innerHTML = desc.replace(/\n/g,'<br>');
+        wrap.classList.add('pause'); wrap.classList.remove('work');
+      } else if (this.state.phase === 'work') {
+        const it = w.items[this.state.idx];
+        const e  = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
+        el.innerHTML = 'Øvelse:<br><strong>' + (e?e.name:it.exercise_id) + '</strong>';
+        const desc = e?.description || '';
+        document.getElementById('details').innerHTML  = desc.replace(/\n/g,'<br>');
+        wrap.classList.add('work'); wrap.classList.remove('pause');
+      } else {
+        el.innerHTML = 'Ferdig!<br><strong></strong>';
+        document.getElementById('details').textContent = '';
+        wrap.classList.remove('work'); wrap.classList.add('pause');
+      }
+    };
+
     const updateUI = () => {
       // total
       document.getElementById('timeTotal').textContent = Util.fmtMMSS(this.state.remainingTotal);
       const totalDone = Math.max(0, totalPlanned - this.state.remainingTotal);
       document.getElementById('barTotal').style.width = Math.min(100,(totalDone/totalPlanned)*100) + '%';
-
-      if (this.state.phase === 'pause') {
-        wrap.classList.add('pause'); wrap.classList.remove('work');
-        const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
-        const next = w.items[nextIdx];
-        if (next) {
-          const e = AppState.exercises.find(x=>x.exercise_id===next.exercise_id);
-          document.getElementById('status').textContent = 'Neste: ' + (e?e.name:next.exercise_id);
-          document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
-        } else {
-          document.getElementById('status').textContent = 'Neste:';
-          document.getElementById('details').textContent = '';
-        }
-      } else if (this.state.phase === 'work') {
-        wrap.classList.add('work'); wrap.classList.remove('pause');
-        const it = w.items[this.state.idx]; const e  = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
-        document.getElementById('status').textContent = 'Øvelse: ' + (e?e.name:it.exercise_id);
-        document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
-      } else {
-        wrap.classList.remove('work'); wrap.classList.add('pause');
-        document.getElementById('status').textContent = 'Ferdig!';
-        document.getElementById('details').textContent = '';
-      }
 
       // fase
       document.getElementById('timePhase').textContent = Util.fmtMMSS(this.state.remainingInPhase);
@@ -142,13 +181,13 @@ const Session = {
       const phaseDone   = Math.max(0, phaseTarget - this.state.remainingInPhase);
       document.getElementById('barPhase').style.width = Math.min(100,(phaseDone/phaseTarget)*100) + '%';
 
+      setStatus();
       refreshListHl();
       updateStartIcon();
     };
 
     const nextPhase = () => {
-      // lydsignal ved fasebytte
-      this._ding();
+      this._ding(); // lyd ved hver overgang
 
       if (this.state.phase === 'pause') {
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
@@ -160,23 +199,28 @@ const Session = {
         if (this.state.idx < w.items.length-1) { this.state.phase = 'pause'; this.state.remainingInPhase = getPauseAfter(this.state.idx); }
         else { this.state.phase = 'done'; this.state.remainingInPhase = 0; this.state.remainingTotal = 0; this.stop(); }
       }
+      // total justeres ikke eksplisitt her; klokket tikker videre
       updateUI();
     };
 
     const step = () => {
       if (!this.state.running || this.state.phase === 'done') return;
       this.state.remainingInPhase = Math.max(0, this.state.remainingInPhase - 1);
-      this.state.remainingTotal   = Math.max(0, this.state.remainingTotal   - 1);
+      // total trekkes hvert sekund
+      this.state.remainingTotal = Math.max(0, this.state.remainingTotal - 1);
       (this.state.remainingInPhase === 0) ? nextPhase() : updateUI();
     };
 
     this.toggle = () => {
+      this._ensureAudio(); // lås opp audio ved første start/pause-trykk (mobil)
       this.state.running = !this.state.running;
       if (this.state.running) this.timer = setInterval(step, 1000);
       else clearInterval(this.timer);
       updateStartIcon();
     };
     this.stop = () => { this.state.running=false; clearInterval(this.timer); updateStartIcon(); };
+
+    const recomputeTotal = () => { this.state.remainingTotal = computeRemainingTotal(); };
 
     const skipPrev = () => {
       if (this.state.phase === 'done') return;
@@ -186,8 +230,9 @@ const Session = {
         this.state.idx = Math.max(-1, this.state.idx - 1);
         this.state.phase = 'pause'; this.state.remainingInPhase = (this.state.idx<0 ? getPauseAfter(-1) : getPauseAfter(this.state.idx));
       }
-      this.state.remainingTotal = totalPlanned; updateUI();
+      recomputeTotal(); updateUI();
     };
+
     const skipNext = () => {
       if (this.state.phase === 'done') return;
       if (this.state.phase === 'work') {
@@ -198,9 +243,10 @@ const Session = {
         if (nextIdx < w.items.length) { this.state.idx = nextIdx; this.state.phase = 'work'; this.state.remainingInPhase = w.items[this.state.idx].duration_sec; }
         else { this.state.phase = 'done'; this.state.remainingInPhase = 0; this.state.remainingTotal = 0; this.stop(); }
       }
-      this.state.remainingTotal = totalPlanned; updateUI();
+      recomputeTotal(); updateUI();
     };
 
+    // Knapp‑handlers
     document.getElementById('start').onclick  = () => this.toggle();
     document.getElementById('prev').onclick   = skipPrev;
     document.getElementById('next').onclick   = skipNext;
@@ -218,14 +264,19 @@ const Session = {
     };
     document.getElementById('discard').onclick= () => { if (confirm('Forkaste økta?')) { this.stop(); navigate('dashboard'); } };
 
+    // Unngå iOS audio‑policy: lås opp ved første interaksjon
+    ['touchend','mousedown'].forEach(ev=>{
+      document.body.addEventListener(ev, ()=>{ if (!this.audioUnlocked) this._ensureAudio(); }, {once:true});
+    });
+
     window.onkeydown = (e) => {
       if (e.code==='Space' || e.code==='Enter') { e.preventDefault(); this.toggle(); }
       else if (e.code==='ArrowRight') skipNext();
       else if (e.code==='ArrowLeft')  skipPrev();
     };
 
-    if (AppState.autostart) { AppState.autostart = false; this.toggle(); }
     updateUI();
+    if (AppState.autostart) { AppState.autostart = false; this.toggle(); }
   }
 };
 window.Session = Session;
