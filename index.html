@@ -8,89 +8,70 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  
-<!-- Ikon-sprite (inline) -->
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;visibility:hidden" aria-hidden="true">
-  <!-- Hamburger -->
-  <symbol id="icon-hamburger" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round">
-    <path d="M4 6h16M4 12h16M4 18h16"/>
-  </symbol>
-  <!-- Play -->
-  <symbol id="icon-play" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M8 5v14l11-7z"/>
-  </symbol>
-  <!-- Pause -->
-  <symbol id="icon-pause" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 5h4v14H6zM14 5h4v14h-4z"/>
-  </symbol>
-  <!-- Next (dobbel pil) -->
-  <symbol id="icon-next" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M5 5l7 7-7 7V5zm7 0l7 7-7 7V5z"/>
-  </symbol>
-  <!-- Prev (dobbel pil venstre) -->
-  <symbol id="icon-prev" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19 5l-7 7 7 7V5zm-7 0L5 12l7 7V5z"/>
-  </symbol>
-  <!-- Save (diskett) -->
-  <symbol id="icon-save" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17 3H5a2 2 0 0 0-2 2v14l4-4h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 7h8v4H7z"/>
-  </symbol>
-  <!-- Trash -->
-  <symbol id="icon-trash" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9z"/>
-  </symbol>
-  <!-- Pencil -->
-  <symbol id="icon-pencil" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-  </symbol>
-  <!-- Star (outline) -->
-  <symbol id="icon-star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-    <path d="M12 17.27l6.18 3.73-1.64-7.03L21 9.24l-7.19-.61L12 2 10.19 8.63 3 9.24l4.46 4.73L5.82 21z"/>
-  </symbol>
-  <!-- Star (filled) -->
-  <symbol id="icon-star-filled" viewBox="0 0 24 24" fill="#FFD54F" stroke="black" stroke-width="1.1">
-    <path d="M12 17.27l6.18 3.73-1.64-7.03L21 9.24l-7.19-.61L12 2 10.19 8.63 3 9.24l4.46 4.73L5.82 21z"/>
-  </symbol>
-  <!-- Plus -->
-  <symbol id="icon-plus" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round">
-    <path d="M12 5v14M5 12h14"/>
-  </symbol>
-</svg>
 
-  <!-- Toppfelt: logo, modulknapper og responsiv hamburgermeny -->
+  <!-- PHOSPHOR ICONS (INLINE SPRITE) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;visibility:hidden" aria-hidden="true">
+    <!-- Play (filled) -->
+    <symbol id="ph-play-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M240,128a8.2,8.2,0,0,1-3.1,6.3l-144,104A8.3,8.3,0,0,1,80,240a8,8,0,0,1-8-8V24a8,8,0,0,1,12.9-6.3l144,104A8.2,8.2,0,0,1,240,128Z"/>
+    </symbol>
+    <!-- Pause (filled) -->
+    <symbol id="ph-pause-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M104,40H72A16,16,0,0,0,56,56V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm80,0H152a16,16,0,0,0-16,16V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,184,40Z"/>
+    </symbol>
+    <!-- Double Caret Right (fast forward) -->
+    <symbol id="ph-caret-double-right-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M133.7,128,75.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Zm96,0L171.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Z"/>
+    </symbol>
+    <!-- Double Caret Left (rewind) -->
+    <symbol id="ph-caret-double-left-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M122.3,128l57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Zm-96,0,57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Z"/>
+    </symbol>
+    <!-- Save (floppy) -->
+    <symbol id="ph-floppy-disk-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M219.3,80.6l-44-44A15.9,15.9,0,0,0,164.7,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V91.3A15.9,15.9,0,0,0,219.3,80.6ZM160,200H96V144h64Zm16-88H80V48h80Z"/>
+    </symbol>
+    <!-- Trash -->
+    <symbol id="ph-trash-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M216,56H168V48a24,24,0,0,0-24-24H112A24,24,0,0,0,88,48v8H40a8,8,0,0,0,0,16h8V208a24,24,0,0,0,24,24H184a24,24,0,0,0,24-24V72h8a8,8,0,0,0,0-16ZM104,48a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8v8H104ZM176,208H80V72H176Z"/>
+    </symbol>
+    <!-- Pencil -->
+    <symbol id="ph-pencil-fill" viewBox="0 0 256 256" fill="currentColor">
+      <path d="M227.3,73.4,182.6,28.7a16,16,0,0,0-22.6,0L44.7,143.9a8.1,8.1,0,0,0-2.1,3.7L32.2,206a8,8,0,0,0,9.3,9.3l58.4-10.4a8.1,8.1,0,0,0,3.7-2.1L227.3,96A16,16,0,0,0,227.3,73.4Zm-86.4,20.5,21.2,21.2L91,186.2l-21.2-21.2ZM168,66.3,189.7,88,168,109.7,146.3,88Z"/>
+    </symbol>
+    <!-- Star (outline) -->
+    <symbol id="ph-star" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M128,20l30.2,61.2L224,92.3l-48,46.7,11.3,66-59.3-31.2L68.7,205l11.3-66-48-46.7,65.8-11.1Z"/>
+    </symbol>
+    <!-- Star (filled) -->
+    <symbol id="ph-star-fill" viewBox="0 0 256 256" fill="#FFD54F" stroke="black" stroke-width="8">
+      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16.1,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16.2,0,0,0,72,224.5L128,195l56,29.5a16.2,16.2,0,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
+    </symbol>
+    <!-- Plus -->
+    <symbol id="ph-plus" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M128 40v176M40 128h176"/>
+    </symbol>
+  </svg>
+
+  <!-- TOPP -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo.png" alt="Logo" />
+      <img src="assets/logo.png" alt="logo" />
       <span>Styrketrening</span>
     </div>
-
-    <!-- Vanlige modulknapper (skjules på smal skjerm via CSS) -->
     <nav class="nav" id="mainNav">
       <button data-route="dashboard" class="nav-btn active">Dashboard</button>
       <button data-route="library" class="nav-btn">Øktvelger</button>
       <button data-route="editor" class="nav-btn">Editor</button>
       <button data-route="log" class="nav-btn">Logg</button>
     </nav>
-
-    <!-- Hamburgermeny-knapp (vises når .nav skjules) -->
-
-    <button id="hamburgerBtn" class="hamburger" aria-label="Meny">
-      <svg class="icon"><use href="#icon-hamburger"/></svg>
-    </button>
-
-
-    <!-- Drop-down panel med modulvalg -->
-    <div id="hamburgerMenu" class="hamburger-menu card" style="display:none;">
-      <button data-route="dashboard" class="menu-item">Dashboard</button>
-      <button data-route="library" class="menu-item">Øktvelger</button>
-      <button data-route="editor" class="menu-item">Editor</button>
-      <button data-route="log" class="menu-item">Logg</button>
-    </div>
   </header>
 
   <main id="app" class="container"></main>
+
   <footer class="footer">© 2026</footer>
 
+  <!-- SCRIPTS -->
   <script src="app.js"></script>
   <script src="modules/dashboard.js"></script>
   <script src="modules/library.js"></script>
@@ -99,4 +80,3 @@
   <script src="modules/log.js"></script>
 </body>
 </html>
-``
