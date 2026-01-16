@@ -17,7 +17,7 @@ const AppState = {
 };
 
 const Util = {
-  fmtMMSS(sec){ sec = Math.max(0, Number(sec)||0); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(Math.floor(sec%60)).padStart(2,'0'); return `${m}:${s}`; },
+  fmtMMSS(sec){ sec = Math.max(0, Number(sec)||0); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; },
   parseMMSS(val){ const t=String(val||''); if(!t.includes(':')) return Number(t)||0; const [m,s]=t.split(':').map(Number); return (Number(m)||0)*60+(Number(s)||0); },
   parseCSV(text, delimiter=';'){
     const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length>0);
@@ -44,7 +44,7 @@ const Util = {
     const esc=(v)=>{ let s=String(v??''); const q=s.includes(delimiter)||s.includes('"')||s.includes('\n'); if (s.includes('"')) s=s.replace(/"/g,'""'); return q?`"${s}"`:s; };
     const head = headers.map(esc).join(delimiter);
     const body = rows.map(r=>r.map(esc).join(delimiter)).join('\n');
-    return '\ufeff' + head + '\n' + body; // UTF-8 BOM for Excel
+    return '\ufeff' + head + '\n' + body;
   },
   download(filename, content, mime='text/plain;charset=utf-8'){
     const blob = new Blob([content], {type:mime});
@@ -73,6 +73,16 @@ function navigate(route){
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
+
+  // Hamburger wiring
+  const hBtn  = document.getElementById('hamburgerBtn');
+  const hMenu = document.getElementById('hamburgerMenu');
+  if (hBtn && hMenu) {
+    hBtn.onclick = () => { hMenu.style.display = (hMenu.style.display === 'none' ? 'block' : 'none'); };
+    hMenu.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click', () => { hMenu.style.display='none'; navigate(el.dataset.route); }));
+    document.addEventListener('click', (e) => { if (!hMenu.contains(e.target) && !hBtn.contains(e.target)) hMenu.style.display = 'none'; });
+  }
+
   Dashboard.render();
 });
 
