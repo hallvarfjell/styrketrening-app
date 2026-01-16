@@ -8,7 +8,7 @@ const Log = {
       '<div class="card">' +
         '<h2>Statistikk</h2>' +
         '<div>Varighet siste 7 dager: <strong>'+Util.fmtMMSS(stats.sum7)+'</strong></div>' +
-        '<div>Snitt per dag (7d): <strong>'+Util.fmtMMSS(stats.avg7)+'</strong></div>' +
+        '<div>Snitt per dag (7d): <strong>'+Util.fmtMMSS(Math.round(stats.avg7))+'</strong></div>' +  // mm:ss uten desimaler
         '<div>Beste dag (PR): <strong>'+Util.fmtMMSS(stats.best.daySec)+'</strong> ('+stats.best.date+')</div>' +
         '<div>Streak (dager på rad): <strong>'+stats.streak+'</strong></div>' +
       '</div>' +
@@ -38,7 +38,6 @@ const Log = {
     );
 
     this._drawChart('logChart', stats.labels, stats.values, stats.yMax);
-
     document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>this.exportTCX(b.dataset.export));
   },
 
@@ -49,78 +48,49 @@ const Log = {
       map.set(d.date, sum);
     });
 
-    // 7 siste dager
     const labels=[], values=[];
     const today=new Date();
     const weekday=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+    let best={date:'—',daySec:0};
     for(let i=6;i>=0;i--){
       const dt=new Date(today); dt.setDate(today.getDate()-i);
       const key=dt.toISOString().substring(0,10);
-      const lab=weekday[dt.getDay()]+' '+dt.getDate(); // uten punktum
-      labels.push(lab); values.push(map.get(key)||0);
+      const lab=weekday[dt.getDay()]+' '+dt.getDate();
+      labels.push(lab);
+      const v=map.get(key)||0;
+      values.push(v);
+      if (v>best.daySec) best={date:key, daySec:v};
     }
-    const sum7=values.reduce((a,b)=>a+b,0);
-    const avg7=sum7/7;
-    const yMax=Math.max(60, ...values);
-
-    // Beste dag
-    let best={date:'—', daySec:0};
-    map.forEach((sec,date)=>{ if(sec>best.daySec) best={date,daySec:sec}; });
+    const sum7=values.reduce((a,b)=>a+b,0), avg7=sum7/7, yMax=Math.max(60, ...values);
 
     // Streak
-    let streak=0;
-    for(let i=0;;i++){
-      const dt=new Date(today); dt.setDate(today.getDate()-i);
-      const key=dt.toISOString().substring(0,10);
-      const v=map.get(key)||0;
-      if (v>0) streak++; else break;
-      if (i>365) break;
-    }
+    let streak=0; for(let i=0;;i++){ const dt=new Date(today); dt.setDate(today.getDate()-i); const key=dt.toISOString().substring(0,10); const v=map.get(key)||0; if(v>0) streak++; else break; if(i>365) break; }
 
     return { labels, values, sum7, avg7, yMax, best, streak };
   },
 
-  _drawChart(canvasId, labels, values, yMax){
-    const c=document.getElementById(canvasId); if(!c) return; const ctx=c.getContext('2d');
-    const W=c.width, H=c.height;
-    ctx.clearRect(0,0,W,H);
-
-    const left=54, right=10, top=16, bottom=40;
-    const chartW=W-left-right, chartH=H-top-bottom;
+  _drawChart(id, labels, values, yMax){
+    const c=document.getElementById(id); if(!c) return; const ctx=c.getContext('2d');
+    const W=c.width, H=c.height; ctx.clearRect(0,0,W,H);
+    const left=54, right=10, top=16, bottom=40, chartW=W-left-right, chartH=H-top-bottom;
 
     // Akser
-    ctx.strokeStyle='#ddd';
-    ctx.beginPath();
-    ctx.moveTo(left, top);
-    ctx.lineTo(left, H-bottom);
-    ctx.lineTo(W-right, H-bottom);
-    ctx.stroke();
+    ctx.strokeStyle='#ddd'; ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, H-bottom); ctx.lineTo(W-right, H-bottom); ctx.stroke();
 
-    // Y-akse tall (minutter) + label "Minutter" flyttet over tallene
-    const steps=4;
-    ctx.fillStyle='#666'; ctx.font='12px sans-serif';
-    for (let i=0;i<=steps;i++){
+    // Y-akse tall (uten "Minutter")
+    const steps=4; ctx.fillStyle='#666'; ctx.font='12px sans-serif';
+    for(let i=0;i<=steps;i++){
       const val=Math.round((yMax*i)/steps);
-      const y=(H-bottom) - (chartH * i / steps);
-      ctx.fillText(String(Math.round(val/60)), left - 30, y + 4);
-      ctx.strokeStyle='#eee';
-      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(W-right, y); ctx.stroke();
+      const y=(H-bottom)-(chartH*i/steps);
+      ctx.fillText(String(Math.round(val/60)), left-30, y+4);
+      ctx.strokeStyle='#eee'; ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(W-right,y); ctx.stroke();
     }
-    // Plasser "Minutter" høyt til venstre så det ikke overlapper tallene
-    ctx.fillStyle='#666'; ctx.font='12px sans-serif';
-    ctx.fillText('Minutter', left - 46, top - 4);
 
     // Stolper
     const bw=Math.floor(chartW/labels.length)-10;
-    labels.forEach((lab,i)=>{
-      const x=left + i*(chartW/labels.length) + 5;
-      const h=Math.max(2, chartH*(values[i]/yMax));
-      const y=(H-bottom) - h;
-      ctx.fillStyle='#4c7a9f';
-      ctx.fillRect(x,y,bw,h);
-
-      ctx.fillStyle='#444'; ctx.font='12px sans-serif';
-      ctx.fillText(lab, x, H - bottom + 16);
+    labels.forEach((lab,i)=>{ const x=left+i*(chartW/labels.length)+5; const h=Math.max(2, chartH*(values[i]/yMax)); const y=(H-bottom)-h;
+      ctx.fillStyle='#4c7a9f'; ctx.fillRect(x,y,bw,h);
+      ctx.fillStyle='#444'; ctx.font='12px sans-serif'; ctx.fillText(lab, x, H-bottom+16);
     });
   },
 
@@ -134,10 +104,8 @@ const Log = {
       xml+='<Lap StartTime="'+new Date(s.start_time_local).toISOString()+'">';
       xml+='<TotalTimeSeconds>'+s.duration_sec+'</TotalTimeSeconds>';
       xml+='<Intensity>Active</Intensity><Track>';
-      for(let t=0;t<s.duration_sec;t++){
-        const tp=new Date(new Date(s.start_time_local).getTime()+t*1000).toISOString();
-        xml+='<Trackpoint><Time>'+tp+'</Time><HeartRateBpm><Value>'+(s.computed_hr_bpm||90)+'</Value></HeartRateBpm></Trackpoint>';
-      }
+      for(let t=0;t<s.duration_sec;t++){ const tp=new Date(new Date(s.start_time_local).getTime()+t*1000).toISOString();
+        xml+='<Trackpoint><Time>'+tp+'</Time><HeartRateBpm><Value>'+(s.computed_hr_bpm||90)+'</Value></HeartRateBpm></Trackpoint>'; }
       xml+='</Track></Lap>';
     });
     xml+='</Activity></Activities></TrainingCenterDatabase>';
