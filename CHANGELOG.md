@@ -231,6 +231,8 @@ SESSION: Melding om man prøver å navigere bort fra økta: "Økt kjører. Avslu
 -------------------------
 REVXX
 GENERELT:
+- Rette opp skrivefeil her og der
+- Korleis få logoen opp dersom ein legg ein snarveg til hjemskjermen på iPhone.
 - Teit navn. Trenger nytt og bedre navn. Legg til logo.
 - Begrepsopprydning. Store bokstaver der det mangler. Puss.
 - Legge inn en del standardøvelser og økter i selve programmet
@@ -240,7 +242,7 @@ GENERELT:
 
 EDITOR:
 Mulighet til å legge inn flere sett. Kopieringsfunksjon av øvelser og hele sett og mulighet for å legge inn seriepause.
-
+LEgge inn favicon (Gjøre selv?)
 SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
 
 Videre arbeid:
