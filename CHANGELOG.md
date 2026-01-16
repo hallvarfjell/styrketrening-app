@@ -196,9 +196,12 @@ Han gav meg en del ikonsett å velge mellom, men han satte også i gang med å l
 XXXXX
 
 REV09:
+Generelt: Alle søppelspann-ikon skal være røde.
 INDEX: Legg til hamburgermeny dersom skjermen appen vises på er for liten til å ha knapper
 DASHBOARD: Ingen endringer.
 ØKTVELGER: Filterknappen for valg av tilgjengelig utstyr har forsvunnet. Legg denne inn på nytt med samme funksjonalitet som før.
+SESSIONS:
+- Feltene skal stables, dvs at listen over øvelser skal være under selve øktkjøringsfeltet. Rammen rundt Øktkjøringsfeltet skal være tykk grønn når øvelsen pågår, og normal når det er pause. Legg inn et "Ding" som lydsignal ved øvergang mellom øvelse og pause
 EDITOR:
 - Feltbreddene er fortsatt alt for brede. Dessuten har feltet for "Bygg økt", "Legg til øvelse" og "Øvelsesbibbliotek" mye større bredde enn feltet me "Filter øvelser". Juster feltbreddene slik at de er like brede, og dersom det ikke er plass til to felt i bredden (Slik som på en mobiltelefon) skal feltene stables.
 - I "Bygg økt"-feltet skal "Fjern"-knappen erstattes med søppelkasse-ikonet. Videre skal pilen som indikerer at øvelsen kan flyttes være tydeligere og flyttes til lengst til høyre på høyde med øvelsesnavnet. "Lagre-økt" boksen skal erstattes med diskett-ikon.
