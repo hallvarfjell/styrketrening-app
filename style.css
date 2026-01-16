@@ -13,11 +13,12 @@ body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); ma
 .container { max-width:1000px; margin:0 auto; padding:16px; }
 
 /* Cards & layout */
-.card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
+.card { width:100%; max-width:100%; background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
 .flex { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
 
 /* 2 kolonner -> stack under 860px */
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid-2 > div { min-width:0; } /* hindrer overflow */
 @media (max-width: 860px) {
   .grid-2 { grid-template-columns: 1fr; }
 }
@@ -27,15 +28,18 @@ body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); ma
   position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border);
   display:flex; align-items:center; gap:12px; padding:10px 16px; z-index:10;
 }
-.topbar .brand { display:flex; align-items:center; gap:8px; font-weight:bold; }
+.topbar .brand { display:flex; align-items:center; gap:8px; font-weight:bold; text-decoration:none; color:inherit; }
 .topbar .brand img { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); }
 
 .nav { display:flex; gap:8px; margin-left:auto; }
 .nav-btn { padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; }
 .nav-btn.active { border-color: var(--accent); color: var(--accent); }
 
-/* Hamburger */
-.hamburger { display:none; margin-left:8px; width:44px; height:44px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; }
+/* Hamburger (til høyre) */
+.hamburger {
+  display:none; margin-left:auto; /* <— viktig for høyreplassering når .nav er skjult */
+  width:44px; height:44px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer;
+}
 .hamburger .icon { width:22px; height:22px; }
 .hamburger-menu { position:absolute; right:16px; top:56px; min-width:180px; z-index:1000; }
 .menu-item { width:100%; text-align:left; padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; margin-bottom:8px; }
@@ -75,7 +79,12 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* Special icon colors */
 .icon-btn.play .icon { color: var(--green); }
-.icon-btn.trash .icon { color: var(--red); }
+.icon-btn.trash .icon { color: var(--red); }  /* alle søppelspann røde */
+
+/* Session card state borders */
+.session-card { transition: border-color 0.2s, border-width 0.2s; }
+.session-card.work  { border-color: var(--green); border-width: 3px; }
+.session-card.pause { border-color: var(--border); border-width: 1px; }
 
 /* Editor – drag handle tydelig på høyre side */
 .item-card { position: relative; }
@@ -84,13 +93,12 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .item-card .drag-handle:active { cursor:grabbing; }
 
-/* Session card state borders */
-.session-card { transition: border-color 0.2s, border-width 0.2s; }
-.session-card.work  { border-color: var(--green); border-width: 3px; }
-.session-card.pause { border-color: var(--border); border-width: 1px; }
-
 /* Editor – 2 kolonner for egenskaper */
 .form-grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 @media (max-width: 640px) {
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+/* Session store overskrift (3×) */
+.session-title { font-size: 60px; font-weight: 700; line-height: 1.15; }
+``
