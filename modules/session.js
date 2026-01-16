@@ -1,5 +1,8 @@
 
 // modules/session.js
+//
+// Ikonknapper (Phosphor): start/pause, forrige/neste (dobbel pil), lagre (diskett), forkast (søppelspann).
+// Status-tekst: “Neste: …” i pause, “Øvelse: …” i arbeid.
 
 const Session = {
   timer: null,
@@ -25,8 +28,8 @@ const Session = {
     })();
 
     this.state = {
-      idx: -1,                   // -1: pre-start
-      phase: 'pause',            // 'pause' | 'work' | 'done'
+      idx: -1,
+      phase: 'pause',
       remainingInPhase: (w.items && w.items.length ? getPauseAfter(-1) : 10),
       remainingTotal: totalPlanned,
       running: false
@@ -35,8 +38,8 @@ const Session = {
     render(
       '<div class="grid-2">' +
         '<div>' +
-          '<div id="sessionWrap" class="card session-wrapper pause">' +
-            '<div id="status" class="session-title">Neste:</div>' +
+          '<div class="card">' +
+            '<div id="status" class="session-status">Neste:</div>' +
             '<div id="details" class="session-details small"></div>' +
 
             '<div class="card">' +
@@ -51,16 +54,14 @@ const Session = {
               '<div id="timeTotal" class="session-timer">00:00</div>' +
             '</div>' +
 
-            '<div class="small" style="color:#666; margin:6px 0;">Tips: Enter/Mellomrom = Pause/Gjenoppta · Piltaster = bytt øvelse</div>' +
+            '<div class="small" style="color:#666; margin:6px 0;">Tips: Enter/Mellomrom = Start/Pause · Piltaster = bytt øvelse</div>' +
 
             '<div class="flex">' +
-              '<button class="icon-btn play" id="start" aria-label="Start/Pause">' +
-                '<svg class="icon"><use href="#icon-play"/></svg>' +
-              '</button>' +
-              '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#icon-prev"/></svg></button>' +
-              '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#icon-next"/></svg></button>' +
-              '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#icon-save"/></svg></button>' +
-              '<button class="icon-btn" id="discard" aria-label="Forkast"><svg class="icon"><use href="#icon-trash"/></svg></button>' +
+              '<button class="icon-btn play" id="start" aria-label="Start/Pause"><svg class="icon"><use href="#ph-play-fill"/></svg></button>' +
+              '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#ph-caret-double-left-fill"/></svg></button>' +
+              '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#ph-caret-double-right-fill"/></svg></button>' +
+              '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#ph-floppy-disk-fill"/></svg></button>' +
+              '<button class="icon-btn" id="discard" aria-label="Forkast"><svg class="icon"><use href="#ph-trash-fill"/></svg></button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -69,8 +70,6 @@ const Session = {
         '</div>' +
       '</div>'
     );
-
-    const wrap = document.getElementById('sessionWrap');
 
     const refreshListHl = () => {
       const list = document.getElementById('list');
@@ -83,10 +82,9 @@ const Session = {
     refreshListHl();
 
     const updateStartBtn = () => {
-      const b = document.getElementById('start');
-      const icon = b.querySelector('use');
-      if (this.state.phase === 'done') { b.disabled = true; return; }
-      icon.setAttribute('href', this.state.running ? '#icon-pause' : '#icon-play');
+      const b = document.getElementById('start').querySelector('use');
+      if (this.state.phase === 'done') { return; }
+      b.setAttribute('href', this.state.running ? '#ph-pause-fill' : '#ph-play-fill');
     };
 
     const currentPhaseTarget = () => {
@@ -102,7 +100,6 @@ const Session = {
       document.getElementById('barTotal').style.width = Math.min(100,(totalDone/totalPlanned)*100) + '%';
 
       if (this.state.phase === 'pause') {
-        wrap.classList.add('pause'); wrap.classList.remove('work');
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
         const next = w.items[nextIdx];
         if (next) {
@@ -114,12 +111,10 @@ const Session = {
           document.getElementById('details').textContent = '';
         }
       } else if (this.state.phase === 'work') {
-        wrap.classList.add('work'); wrap.classList.remove('pause');
         const it = w.items[this.state.idx]; const e  = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
         document.getElementById('status').textContent = 'Øvelse: ' + (e?e.name:it.exercise_id);
         document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
       } else {
-        wrap.classList.remove('work'); wrap.classList.remove('pause');
         document.getElementById('status').textContent = 'Ferdig!';
         document.getElementById('details').textContent = '';
       }
@@ -215,4 +210,3 @@ const Session = {
 };
 
 window.Session = Session;
-``
