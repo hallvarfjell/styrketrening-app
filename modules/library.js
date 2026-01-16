@@ -1,7 +1,10 @@
 
 // modules/library.js
+//
+// Ikonknapper (Phosphor) i aksjonsraden: Start (play), Rediger (pencil), Slett (trash), Favoritt (stjerne) – stjernen etter Slett.
+// Eksporter/Importer er robuste.
+// Fokusområde-dropdown hentes fra øvelser.
 
-// Predefinerte (om tom lagring). Juster ved behov.
 const PREDEF_EXERCISES_CSV = `exercise_id;name;description;default_duration_sec;default_pause_sec;intensitet;category;focus_area;equipment;noise_level
 EX100;Knebøy;Stå støtt, senk hoftene og press opp.;60;10;Middels;Styrke/Spenst;Underkropp;;Medium
 EX101;Push-up;Stram kjernen og hold linje gjennom kroppen.;45;10;Middels;Styrke/Spenst;Overkropp;;Medium
@@ -48,33 +51,22 @@ function seedPredefinedIfEmpty() {
   }
 }
 
-function downloadCsvSafe(filename, csv) {
-  if (typeof Util?.download === 'function') {
-    Util.download(filename, csv, 'text/csv;charset=utf-8');
-  } else {
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
-  }
-}
-
 const Library = {
   render(){
     seedPredefinedIfEmpty();
 
-    // Fokusverdier fra øvelsesbiblioteket
+    // Fokus fra øvelser
     const focusSet = new Set((AppState.exercises||[]).map(e=>e.focus_area).filter(Boolean));
     const allFocus = Array.from(focusSet).sort((a,b)=>String(a).localeCompare(String(b)));
-
-    // Utstyr (multivalg)
-    const eqSet = new Set();
-    (AppState.exercises||[]).forEach(e => (e.equipment||[]).forEach(x=>{ if(x) eqSet.add(x); }));
-    const allEquipment = Array.from(eqSet).sort();
 
     // Kategorier fra økter
     const catSet = new Set((AppState.workouts||[]).map(w=>w.category).filter(Boolean));
     const allCats = Array.from(catSet).sort((a,b)=>String(a).localeCompare(String(b)));
+
+    // Utstyr fra øvelser
+    const eqSet = new Set();
+    (AppState.exercises||[]).forEach(e => (e.equipment||[]).forEach(x=>{ if(x) eqSet.add(x); }));
+    const allEquipment = Array.from(eqSet).sort();
 
     render(
       '<div class="card">' +
@@ -83,18 +75,7 @@ const Library = {
           '<select id="filterFocus" class="input"><option value="">Fokusområde (alle)</option>' + allFocus.map(f=>'<option>'+f+'</option>').join('') + '</select>' +
           '<select id="filterCat" class="input"><option value="">Kategori (alle)</option>' + allCats.map(c=>'<option>'+c+'</option>').join('') + '</select>' +
         '</div>' +
-
-        '<div class="multiselect" style="margin-top:8px;">' +
-          '<button id="eqBtn" class="input">Tilgjengelig utstyr</button>' +
-          '<div id="eqMenu" class="card" style="display:none; position:relative; z-index:5; max-width:520px;">' +
-            '<div class="flex" style="flex-wrap:wrap; gap:8px;">' +
-              '<label><input type="checkbox" id="eqAll"> Velg alle</label>' +
-              allEquipment.map(eq=>'<label><input type="checkbox" class="eq-opt" value="'+eq+'"> '+eq+'</label>').join('') +
-            '</div>' +
-          '</div>' +
-          '<div id="eqHint" class="small" style="margin-top:6px; color:#666;">kun kroppsvekt</div>' +
-        '</div>' +
-
+        '<div class="small" style="margin-top:6px;">Tilgjengelig utstyr (informasjonsvisning): '+(allEquipment.length? allEquipment.join(', ') : '—')+'</div>' +
         '<div style="margin-top:8px;"><input id="filterName" class="input" placeholder="Søk (navn)" /></div>' +
         '<div id="wklist" style="margin-top:8px;"></div>' +
       '</div>' +
@@ -110,51 +91,36 @@ const Library = {
       '</div>'
     );
 
-    // Utstyr-dropdown
-    const eqBtn=document.getElementById('eqBtn'), eqMenu=document.getElementById('eqMenu'), eqHint=document.getElementById('eqHint');
-    eqBtn.onclick=()=>{ eqMenu.style.display=(eqMenu.style.display==='none'?'block':'none'); };
-    let selectedEquip = new Set();
-    const eqAll=document.getElementById('eqAll');
-    eqAll.onchange=()=>{ selectedEquip=new Set(eqAll.checked?allEquipment:[]); document.querySelectorAll('.eq-opt').forEach(cb=>cb.checked=eqAll.checked); refreshList(); };
-    document.querySelectorAll('.eq-opt').forEach(cb=>cb.onchange=()=>{ if(cb.checked)selectedEquip.add(cb.value); else selectedEquip.delete(cb.value); eqAll.checked=(selectedEquip.size===allEquipment.length); refreshList(); });
-    const refreshHint=()=>{ const arr=Array.from(selectedEquip); eqHint.textContent=arr.length?arr.join(', '):'kun kroppsvekt'; };
-
     const getEquipForWorkout = (w) => {
       const s=new Set(); (w.items||[]).forEach(it=>{ const ex=AppState.exercises.find(e=>e.exercise_id===it.exercise_id); (ex?.equipment||[]).forEach(eq=>{ if(eq)s.add(eq); }); }); return Array.from(s);
     };
 
     function refreshList(){
-      refreshHint();
       const focus=document.getElementById('filterFocus').value;
       const cat=document.getElementById('filterCat').value;
-      const q=(document.getElementById('filterName').value||'').trim().toLowerCase();
+      const nameQ=(document.getElementById('filterName').value||'').trim().toLowerCase();
 
       let list=AppState.workouts.slice();
       if (focus) list=list.filter(w=>w.focus_area===focus);
       if (cat)   list=list.filter(w=>w.category  ===cat);
-      if (q)     list=list.filter(w=>(w.name||'').toLowerCase().includes(q));
-
-      const sel=Array.from(selectedEquip);
-      list=list.filter(w=>{ const req=getEquipForWorkout(w); if(!sel.length) return req.length===0; return req.every(eq=>sel.includes(eq)); });
+      if (nameQ) list=list.filter(w=>(w.name||'').toLowerCase().includes(nameQ));
 
       list.sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0));
 
       const html=list.map(w=>{
-        const req=getEquipForWorkout(w);
+        const req = getEquipForWorkout(w);
         return (
           '<div class="card">' +
             '<div class="row">' +
               '<div class="title"><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span><div class="small">Utstyr: '+(req.length?req.join(', '):'ingen')+'</div></div>' +
               '<div class="actions" style="display:flex;gap:8px;">' +
-                // Start (grønn play)
-                '<button class="icon-btn play" aria-label="Start" data-start="'+w.workout_id+'"><svg class="icon"><use href="#icon-play"/></svg></button>' +
-                // Rediger (blyant)
-                '<button class="icon-btn" aria-label="Rediger" data-edit="'+w.workout_id+'"><svg class="icon"><use href="#icon-pencil"/></svg></button>' +
-                // Slett (søppelspann)
-                '<button class="icon-btn" aria-label="Slett" data-del="'+w.workout_id+'"><svg class="icon"><use href="#icon-trash"/></svg></button>' +
-                // Favoritt (stjerne — outline/filled)
+                '<button class="icon-btn play" aria-label="Start" data-start="'+w.workout_id+'"><svg class="icon"><use href="#ph-play-fill"/></svg></button>' +
+                '<button class="icon-btn" aria-label="Rediger" data-edit="'+w.workout_id+'"><svg class="icon"><use href="#ph-pencil-fill"/></svg></button>' +
+                '<button class="icon-btn" aria-label="Slett" data-del="'+w.workout_id+'"><svg class="icon"><use href="#ph-trash-fill"/></svg></button>' +
                 '<button class="icon-btn fav '+(w.favorite?'active':'')+'" aria-label="Favoritt" data-fav="'+w.workout_id+'">' +
-                  '<svg class="icon"><use href="#'+(w.favorite?'icon-star-filled':'icon-star-outline')+'"/></svg>' +
+                  (w.favorite
+                    ? '<svg class="icon"><use href="#ph-star-fill"/></svg>'
+                    : '<svg class="icon"><use href="#ph-star"/></svg>') +
                 '</button>' +
               '</div>' +
             '</div>' +
@@ -164,10 +130,22 @@ const Library = {
 
       document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter matcher filteret.</div>';
 
-      document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.start); AppState.currentWorkout=w; AppState.autostart=true; Session.render(); setActive('none'); });
-      document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.edit); Editor.render(w); setActive('editor'); });
-      document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const wid=b.dataset.del; const idx=AppState.workouts.findIndex(x=>x.workout_id===wid); if(idx>=0&&confirm('Slette økta?')){ AppState.workouts.splice(idx,1); Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }});
-      document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.fav); if(w){ w.favorite=!w.favorite; Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }});
+      document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{
+        const w=AppState.workouts.find(x=>x.workout_id===b.dataset.start);
+        AppState.currentWorkout=w; AppState.autostart=true; Session.render(); setActive('none');
+      });
+      document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{
+        const w=AppState.workouts.find(x=>x.workout_id===b.dataset.edit);
+        Editor.render(w); setActive('editor');
+      });
+      document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+        const wid=b.dataset.del; const idx=AppState.workouts.findIndex(x=>x.workout_id===wid);
+        if(idx>=0 && confirm('Slette økta?')){ AppState.workouts.splice(idx,1); Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }
+      });
+      document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{
+        const w=AppState.workouts.find(x=>x.workout_id===b.dataset.fav);
+        if (w){ w.favorite=!w.favorite; Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }
+      });
     }
 
     // Import/eksport
@@ -193,10 +171,12 @@ const Library = {
     document.getElementById('exportWk').onclick=()=>{
       const headers=['workout_id','name','category','focus_area','favorite','pause_between_items_sec','items'];
       const rows=(AppState.workouts||[]).map(w=>[
-        w.workout_id,w.name,w.category,w.focus_area,w.favorite,w.pause_between_items_sec,(w.items||[]).map(i=>i.exercise_id+':'+i.duration_sec).join('|')
+        w.workout_id,w.name,w.category,w.focus_area,w.favorite,
+        w.pause_between_items_sec,
+        (w.items||[]).map(i=>i.exercise_id+':'+i.duration_sec).join('|')
       ]);
       const csv=Util.toCSV(headers,rows,';');
-      downloadCsvSafe('workouts.csv', csv); // robust fallback
+      Util.download('workouts.csv', csv, 'text/csv;charset=utf-8');
     };
 
     refreshList();
