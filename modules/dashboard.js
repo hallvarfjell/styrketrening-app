@@ -13,35 +13,46 @@ const Dashboard = {
       }
       if (lastThree.length >= 3) break;
     }
-    // Alle favoritter
     const favorites = (AppState.workouts || []).filter(w => w.favorite);
 
-    render(
-      '<div class="grid-2">' +
-        '<div>' +
-          '<h3>Siste økter</h3>' +
-          (lastThree.length
-            ? lastThree.map(s => (
-                '<div class="card">' +
-                  '<div><strong>'+s.name+'</strong> <span class="small">('+Util.fmtMMSS(s.duration_sec)+')</span></div>' +
-                  '<button class="button" data-wid="'+s.workout_id+'">Start igjen</button>' +
-                '</div>'
-              )).join('')
-            : '<div class="card small">Ingen loggede økter ennå.</div>') +
-        '</div>' +
-        '<div>' +
-          '<h3>Favorittøkter</h3>' +
-          (favorites.length
-            ? favorites.map(w => (
-                '<div class="card">' +
-                  '<div><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span></div>' +
-                  '<button class="button" data-wid="'+w.workout_id+'">Start</button>' +
-                '</div>'
-              )).join('')
-            : '<div class="card small">Ingen favoritter. Merk i Øktvelger.</div>') +
-        '</div>' +
+    const section = (title, itemsHtml) => (
+      '<div>' +
+        (title ? '<h3>'+title+'</h3>' : '') +
+        itemsHtml +
       '</div>'
     );
+
+    const recentHtml = lastThree.length
+      ? lastThree.map(s =>
+          '<div class="card">' +
+            '<div class="row">' +
+              '<div class="title"><strong>'+s.name+'</strong> <span class="small">('+Util.fmtMMSS(s.duration_sec)+')</span></div>' +
+              '<div class="actions">' +
+                '<button class="icon-btn play" aria-label="Start igjen" data-wid="'+s.workout_id+'">' +
+                  '<svg class="icon"><use href="#icon-play"/></svg>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        ).join('')
+      : '<div class="card small">Ingen loggede økter ennå.</div>';
+
+    const favHtml = favorites.length
+      ? favorites.map(w =>
+          '<div class="card">' +
+            '<div class="row">' +
+              '<div class="title"><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span></div>' +
+              '<div class="actions">' +
+                '<button class="icon-btn play" aria-label="Start" data-wid="'+w.workout_id+'">' +
+                  '<svg class="icon"><use href="#icon-play"/></svg>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        ).join('')
+      : '<div class="card small">Ingen favoritter. Merk i Øktvelger.</div>';
+
+    render('<div class="grid-2">' + section('Siste økter', recentHtml) + section('Favorittøkter', favHtml) + '</div>');
 
     document.querySelectorAll('button[data-wid]').forEach(btn => {
       btn.addEventListener('click', () => {
