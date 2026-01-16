@@ -210,6 +210,21 @@ EDITOR:
 LOGG:
 - Det forsvant en del gøy statistikk fra loggen i forrige revisjon, for eksempel Streak og Beste dag (med varighet og dato) Legg inn dette på nytt.
 - Teksten "Minutter" legger seg oppå verdiene på den loddrette aksen på stolpediagrammet. Dette gjør det vanskelig å lese. Endre dette.
+
+REV10 - Vi er back on track
+INDEX
+- Juster plasseringen av burgermenyikonet. Denne skal stå til høyre på skjermen.
+- La logen også være en hyperlink til Dashboardmodulen.
+EDITOR:
+- Feltbreddene for "Bygg økt", "Legg til øvelse" og "Øvelsesbibbliotek" fortsatt større  enn feltet med "Filter øvelser". Juster feltbreddene slik at de er like brede. Behold stablefunksjonalitet dersom det ikke er plass til to felt i bredden (Slik som på en mobiltelefon) som den er.
+- I "Bygg økt"-feltet: Fjern den forhåndsdefinerte verdien fra boksen "Fokusområde".
+SESSION:
+- Progressbar og timer for hele økta resettes når man skipper mellom øvelser. Dette må endres. Progressbar og timer må gjenspeile hvor mye tid som gjenstår dersom resten av økta går uavbrutt.
+- Jeg vil endre på teksten Neste/Øvelse: [Øktnavn]. Fonten skal være tre ganger så stor. Linjeskift etter Neste/Øvelse. Øvelsesnavn i fet skrift.
+- Det er ingen Ding (lyd) når jeg kjører økta på mobilen.
+LOGG:
+- Formatet på tid for snitt per dag skal være mm:ss uten desimaler.
+- Fjern teksten "minutter" på Y-aksen.
 -------------------------
 REVXX
 GENERELT:
