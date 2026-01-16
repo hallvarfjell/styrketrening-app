@@ -185,7 +185,18 @@ REV08:
 -   Fjern overskriftene i feltene.
 -   Endre datoformatet i stolpediagramet til å inkludere et punktum etter datoen, altså "Onsdag 14." istedet for "Onsdag 14)
 -   Fjern ordet "Minutter" fra den loddrette aksen. Øk tekststørrelsen på tallene på den loddrette aksen for bedre synlighet (spesielt for telefonskjermer. Fjern antall minutter over stolpene.
-  
+
+XXXXX
+Kjøring av REV08 med Copilot gikk ikke bra. Alt ble seende dritt ut. Jeg gav følgende prompt:
+"Hva skjedde med designet her? Alt ble seende veldig basic ut. Alle rammene forsvant. Nesten alle fargene forsvant.
+Gjør et forsøk på å løse oppgaven en gang til. Ta utgangspunkt i filene slik de var før mine forrige endringsønsker. Se bort fra mitt ønske om mobilvennlighet inntil videre. Gi meg eksempler på ikonsett jeg kan velge fra før implementering. Gi til slutt en komplett versjon av alle filer jeg skal gjøre endringer i."
+
+Han gav meg en del ikonsett å velge mellom, men han satte også i gang med å lage nytt sett med filer, reversert en versjon. Så feilet kjøringen og jeg gav han promptet en gang til, med litt justering: "Noe veldig galt skjedde med utseendet her. Ta utgangspunkt i filene slik de var før mine forrige endringsønsker og gjør et forsøk på å løse oppgaven en gang til. Bruk ikonsett "Phosphor icons". Gi komplette versjon av alle filer jeg skal gjøre endringer i."
+
+Det kan virke som at jeg må gjøre en helt ny QA og nytt prompt for rev09 som inneholder en del av det jeg ba om i rev 08.
+XXXXX
+
+
 -------------------------
 REVXX
 GENERELT:
