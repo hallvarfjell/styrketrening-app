@@ -17,53 +17,49 @@ const AppState = {
 };
 
 const Util = {
-  fmtMMSS(sec){ const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(Math.floor(sec%60)).padStart(2,'0'); return `${m}:${s}`; },
-  parseMMSS(str){ const [m,s]=str.split(':').map(Number); return m*60 + s; },
+  fmtMMSS(sec){ sec = Math.max(0, Number(sec)||0); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(Math.floor(sec%60)).padStart(2,'0'); return `${m}:${s}`; },
+  parseMMSS(val){ const t=String(val||''); if(!t.includes(':')) return Number(t)||0; const [m,s]=t.split(':').map(Number); return (Number(m)||0)*60+(Number(s)||0); },
   parseCSV(text, delimiter=';'){
-    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l=>l.trim().length>0);
+    const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length>0);
     if (!lines.length) return [];
     const headers = Util._parseCSVLine(lines[0], delimiter);
     const rows = [];
-    for (let i=1; i<lines.length; i++){
-      const cols = Util._parseCSVLine(lines[i], delimiter);
-      const obj = {}; headers.forEach((h, idx) => obj[h] = (cols[idx] ?? '').trim());
-      rows.push(obj);
+    for (let i=1;i<lines.length;i++){
+      const cols = Util._parseCSVLine(lines[i], delimiter); const obj = {};
+      headers.forEach((h,idx)=>obj[h]=(cols[idx]??'').trim()); rows.push(obj);
     }
     return rows;
   },
-  _parseCSVLine(line, delimiter){
-    const result = []; let cur = '', inQuotes = false;
-    for (let i=0; i<line.length; i++){
+  _parseCSVLine(line, delimiter=';'){
+    const res=[]; let cur='', inQ=false;
+    for (let i=0;i<line.length;i++){
       const ch=line[i];
-      if (ch === '"'){ if (inQuotes && line[i+1] === '"'){ cur+='"'; i++; } else inQuotes=!inQuotes; }
-      else if (ch === delimiter && !inQuotes){ result.push(cur); cur=''; }
+      if (ch==='\"'){ if (inQ && line[i+1]==='\"'){ cur+='\"'; i++; } else inQ=!inQ; }
+      else if (ch===delimiter && !inQ){ res.push(cur); cur=''; }
       else cur+=ch;
     }
-    result.push(cur); return result;
+    res.push(cur); return res;
   },
   toCSV(headers, rows, delimiter=';'){
-    const esc = (val) => {
-      let s = String(val ?? '');
-      const needsQuotes = s.includes(delimiter) || s.includes('"') || s.includes('\n');
-      if (s.includes('"')) s = s.replace(/"/g, '""');
-      return needsQuotes ? `"${s}"` : s;
-    };
+    const esc=(v)=>{ let s=String(v??''); const q=s.includes(delimiter)||s.includes('"')||s.includes('\n'); if (s.includes('"')) s=s.replace(/"/g,'""'); return q?`"${s}"`:s; };
     const head = headers.map(esc).join(delimiter);
-    const body = rows.map(r => r.map(esc).join(delimiter)).join('\n');
-    return '\ufeff' + head + '\n' + body;
+    const body = rows.map(r=>r.map(esc).join(delimiter)).join('\n');
+    return '\ufeff' + head + '\n' + body; // UTF-8 BOM for Excel
+  },
+  download(filename, content, mime='text/plain;charset=utf-8'){
+    const blob = new Blob([content], {type:mime});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 500);
   }
 };
 
 function render(html){ document.getElementById('app').innerHTML = html; }
-function setActive(route){
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.route===route));
-}
+function setActive(route){ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.route===route)); }
 
 function navigate(route){
   window.onkeydown = null;
   AppState.currentRoute = route;
   setActive(route);
-
   try {
     if (route === 'dashboard') Dashboard.render();
     if (route === 'library')   Library.render();
@@ -71,29 +67,14 @@ function navigate(route){
     if (route === 'log')       Log.render();
   } catch (err) {
     console.error('Feil ved navigering til', route, err);
-    alert('Det oppstod en feil ved åpning av ' + route + '.\nSe Console (F12) for detaljer.\n\n' + (err && err.message ? err.message : err));
+    alert('Det oppstod en feil ved åpning av ' + route + '. Se Console (F12) for detaljer.\n\n' + (err?.message||err));
   }
-
-  const menu = document.getElementById('hamburgerMenu'); 
-  if (menu) menu.style.display='none';
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
-
-  // Hamburgermeny
-  const hBtn  = document.getElementById('hamburgerBtn');
-  const hMenu = document.getElementById('hamburgerMenu');
-  if (hBtn && hMenu) {
-    hBtn.onclick = () => { hMenu.style.display = (hMenu.style.display === 'none' ? 'block' : 'none'); };
-    hMenu.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.route)));
-    document.addEventListener('click', (e) => {
-      if (!hMenu.contains(e.target) && !hBtn.contains(e.target)) { hMenu.style.display = 'none'; }
-    });
-  }
-
   Dashboard.render();
 });
 
 window.AppState=AppState; window.Store=Store; window.Util=Util; window.navigate=navigate;
+``
