@@ -149,11 +149,47 @@ I "Filter øvelser"-feltet:
 LOGG
 - Progresjonsgrafen må angi verdi på antall minutter på loddrett akse. Den skaleres for god visuell presentasjon. De siste syv ukedager på den horisontale aksen angis i formatet "Ukedag DATO, eksempelvis "Onsdag 14.
 - Sett inn klokkeslett for når økta ble kjørt før øktnavnet i loggfeltet.
+
+REV08:
+- Generelt: Jeg vil bytte ut knapper med tekst til fordel for knapper med ikoner. Like knapper skal ha like ikoner mellom de ulike modulene. De forskjellige ikonene må ha samme formuttrykk.
+- Index:
+-   Hamburgermenyen har veldig små streker når den vises på mobiltelefon/ipad. Kan du gjøre den mer mobilvennlig?
+- Dashboard
+-   Jeg ønsker "Start igjen" og "Start" knappene til å være et start-ikon, på samme høyde som Øktnavnet. Start-ikonet skal være en grønn pil (trekant) som peker til høyre. Dersom det ikke er plass til både øvelsesnavnet og pila (start-ikonet) på samme linje skal teksten brytes før pila (start-ikonet)
+- Øktvelger
+-   Jeg ønsker at knappene endres til ikoner. Start-knappen skal være lik som startknappen på Dashboard. Favorittknappen skal være en stjerne (uten tekst). Når den ikke er aktivert skal den ha svart ramme uten fyll. Når den er aktivert skal den ha svart ramme med gult fyll. Ikke endre annen funksjonalitet. Plasser stjernen etter "Slett"-knappen. Rediger-knappen skal ha blyant-ikon og slett-knappen skal ha et søppelspann-ikon. Alle ikoner skal ha samme stil. Tilpass størrelsen slik at den er omtrent som høyden til dagens knapper.
+-   "Eksporter økter"-knappen virker ikke. "Importer økter"-knappen fungerer som den skal.
+- Session
+-   Erstatt teksten "Gjør deg klar"! og "Kjør!" med henholdsvis Neste: [Øvelsesnavn], og "Øvelse: [Øvelsesnavn]. Samme skriftstørrelse som det dagens "Gjør deg klar!" og "Kjør!" har.
+-   La bakgrunnsfargen når øvelsen er i gang være grønn. I pausen kan den være grønn.
+-   Jeg ønsker at knappene endres til ikoner. Start/pause-knappen skal være en start/pause-knapp, med samme uttrykk som startknappen på Dashboard. "Pauseknappen" skal være et pausesymbol, "Forrige" og "Neste" skal ha dobbel pil (trekant) ikon. Lagre-knappen skal ha diskett-ikon og Forkast-knappen skal ha søppelbøtte ikon. 
+- Editor
+-   Alle felt skal ha samme bredde. Feltbredden skal være dynamisk og tilpasses skjermen.
+-   Tekstboksene for øktnavn og beskrivelse er fortsatt bredere enn feltet boksene er inni. Tilpass boksene slik at de får plass inni feltene de er inni.
+-  I feltet "Bygg økt"
+-    Legg til hjelpetekst under teksten "Bygg økt": "Bruk PLUSSIKON for å legge til øvelse". Endre rekkefølge med dra-og-slipp. Der jeg har skrevet PLUSSIKON legger du inn selve pluss-ikonet.
+-   Ikke ha forhåndsutfylt verdi i fokusområde
+-   Gi feilmelding dersom økt blir forsøkt lagret uten at alle verdier (Øktnavn, Fokusområde, Kategori og øvelser) er utfylt. Inkluder i feilmeldingen hvilke verdier som mangler.
+-   Tydeliggjør at rekkefølgen på øvelser i økta kan endres ved å dra i dem.
+-  I feltet "Legg til øvelse"
+-     Endre tekst "Legg til øvelse" til "Lag/rediger øvelse".
+-     Boksene "Varighet" og "Varighet pause" sidestilles
+-     Boksene "Fokusområde" og "Kategori" sidestilles
+-     Boksene "Intensitet" og "Lydnivå" sidestilles
+-  I feltet "Øvelsesbibliotek"
+-   "Eksporter øvelser"-knappen virker ikke. "Importer øvelser"-knappen fungerer som den skal.
+-   I feltet med øvelseslista:
+-     Endre teksten "Filter øvelser" til "Øvelser"
+-     Endre knappene "Legg til i økt", "Rediger" og "Slett" til ikoner, henholdsvis med pluss-ikon, blyant-ikon og søppelbøtte-ikon, like som på resten av siden.
+- Logg
+-   Fjern overskriftene i feltene.
+-   Endre datoformatet i stolpediagramet til å inkludere et punktum etter datoen, altså "Onsdag 14." istedet for "Onsdag 14)
+-   Fjern ordet "Minutter" fra den loddrette aksen. Øk tekststørrelsen på tallene på den loddrette aksen for bedre synlighet (spesielt for telefonskjermer. Fjern antall minutter over stolpene.
   
 -------------------------
 REVXX
 GENERELT:
-- Teit navn. Trenger nytt og bedre navn.
+- Teit navn. Trenger nytt og bedre navn. Legg til logo.
 - Begrepsopprydning. Store bokstaver der det mangler. Puss.
 - Legge inn en del standardøvelser og økter i selve programmet
 - Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout? (be om å oppdatere style.css)
@@ -169,3 +205,5 @@ Videre arbeid:
 - Tilkobling pulsbelte
 - Forhåndsdefinerte kategorier?
 - RPE på øvelsesvelgeren
+- Ha appen i skya slik at økter, øvelser og favoritter er felles mellom pc/tablet/tlf. (Kan vel ikke ha telefonlagring)
+- Ulempe: Må være på nett for å kjøre økt fra github/lsok.
