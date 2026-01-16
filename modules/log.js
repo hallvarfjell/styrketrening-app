@@ -5,21 +5,11 @@ const Log = {
   render() {
     const stats = this._computeStats();
     render(
+      // Ingen overskrifter i feltene:
       '<div class="card">' +
-        '<h2>Statistikk</h2>' +
-        '<div>Varighet siste 7 dager: <strong>'+Util.fmtMMSS(stats.sum7)+'</strong></div>' +
-        '<div>Snitt per dag (7d): <strong>'+Util.fmtMMSS(stats.avg7)+'</strong></div>' +
-        '<div>Beste dag (PR): <strong>'+Util.fmtMMSS(stats.best.daySec)+'</strong> ('+stats.best.date+')</div>' +
-        '<div>Streak (dager på rad): <strong>'+stats.streak+'</strong></div>' +
-      '</div>' +
-
-      '<div class="card">' +
-        '<h2>Progresjon (7 dager)</h2>' +
         '<canvas id="logChart" width="800" height="260" style="max-width:100%;"></canvas>' +
       '</div>' +
-
       '<div class="card">' +
-        '<h2>Logg (per dag)</h2>' +
         (
           (AppState.logs||[]).slice().reverse().map(d =>
             '<div class="card">' +
@@ -45,21 +35,18 @@ const Log = {
     const map=new Map();
     (AppState.logs||[]).forEach(d => { const sum=(d.sessions||[]).reduce((a,b)=>a+(b.duration_sec||0),0); map.set(d.date,sum); });
 
-    // 7 siste dager
     const labels=[], values=[];
     const today=new Date();
     const weekday=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
     for(let i=6;i>=0;i--){
       const dt=new Date(today); dt.setDate(today.getDate()-i);
       const key=dt.toISOString().substring(0,10);
-      const lab=weekday[dt.getDay()]+' '+dt.getDate();
+      const lab=weekday[dt.getDay()]+' '+dt.getDate()+'.'; // punktum etter datoen
       labels.push(lab); values.push(map.get(key)||0);
     }
-    const sum7=values.reduce((a,b)=>a+b,0), avg7=sum7/7, yMax=Math.max(60, ...values);
-    let best={date:'—',daySec:0}; map.forEach((sec,date)=>{ if(sec>best.daySec) best={date,daySec:sec}; });
+    const yMax=Math.max(60, ...values); // minst 1 minutt
 
-    let streak=0; for(let i=0;;i++){ const dt=new Date(today); dt.setDate(today.getDate()-i); const key=dt.toISOString().substring(0,10); const v=map.get(key)||0; if(v>0) streak++; else break; if(i>365) break; }
-    return { labels, values, sum7, avg7, best, streak, yMax };
+    return { labels, values, yMax };
   },
 
   _drawChart(id, labels, values, yMax){
@@ -67,22 +54,23 @@ const Log = {
     const W=c.width, H=c.height; ctx.clearRect(0,0,W,H);
     const left=50, right=10, top=10, bottom=40, chartW=W-left-right, chartH=H-top-bottom;
 
-    // Akser
     ctx.strokeStyle='#ddd'; ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, H-bottom); ctx.lineTo(W-right, H-bottom); ctx.stroke();
 
-    // Y-akse (minutter)
-    const steps=4; ctx.fillStyle='#666'; ctx.font='12px sans-serif';
-    for(let i=0;i<=steps;i++){ const val=Math.round((yMax*i)/steps); const y=(H-bottom)-(chartH*i/steps);
-      ctx.fillText(String(Math.round(val/60)), left-30, y+4); ctx.strokeStyle='#eee'; ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(W-right,y); ctx.stroke();
+    // Y-akse tall (uten "Minutter")
+    const steps=4; ctx.fillStyle='#222'; ctx.font='bold 14px sans-serif'; // større og tydeligere
+    for(let i=0;i<=steps;i++){
+      const val=Math.round((yMax*i)/steps);
+      const y=(H-bottom)-(chartH*i/steps);
+      ctx.fillText(String(Math.round(val/60)), left-30, y+4); // bare tall (minutter)
+      ctx.strokeStyle='#eee'; ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(W-right,y); ctx.stroke();
     }
-    ctx.fillStyle='#666'; ctx.fillText('Minutter', left-40, top+10);
 
-    // Stolper
+    // Stolper (uten tall over stolpene)
     const bw=Math.floor(chartW/labels.length)-10;
-    labels.forEach((lab,i)=>{ const x=left+i*(chartW/labels.length)+5; const h=Math.max(2, chartH*(values[i]/yMax)); const y=(H-bottom)-h;
+    labels.forEach((lab,i)=>{
+      const x=left+i*(chartW/labels.length)+5; const h=Math.max(2, chartH*(values[i]/yMax)); const y=(H-bottom)-h;
       ctx.fillStyle='#4c7a9f'; ctx.fillRect(x,y,bw,h);
       ctx.fillStyle='#444'; ctx.font='12px sans-serif'; ctx.fillText(lab, x, H-bottom+16);
-      ctx.fillStyle='#333'; ctx.fillText(String(Math.round((values[i]||0)/60)), x, y-4);
     });
   },
 
@@ -101,8 +89,8 @@ const Log = {
       xml+='</Track></Lap>';
     });
     xml+='</Activity></Activities></TrainingCenterDatabase>';
-    Util.download('log_'+dateStr+'.tcx', xml);
+    Util.download ? Util.download('log_'+dateStr+'.tcx', xml) :
+      (()=>{ const blob=new Blob([xml],{type:'application/xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='log_'+dateStr+'.tcx'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); })();
   }
 };
-window.Log=Log;
-``
+window.Log = Log;
