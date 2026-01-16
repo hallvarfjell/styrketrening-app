@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Styrketreningsapp</title>
-  style.css
+  <!-- RIKTIG: lenke til CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -19,11 +20,11 @@
     <symbol id="ph-pause-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M104,40H72A16,16,0,0,0,56,56V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm80,0H152a16,16,0,0,0-16,16V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,184,40Z"/>
     </symbol>
-    <!-- Double Caret Right (fast forward) -->
+    <!-- Double Caret Right -->
     <symbol id="ph-caret-double-right-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M133.7,128,75.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Zm96,0L171.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Z"/>
     </symbol>
-    <!-- Double Caret Left (rewind) -->
+    <!-- Double Caret Left -->
     <symbol id="ph-caret-double-left-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M122.3,128l57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Zm-96,0,57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Z"/>
     </symbol>
@@ -31,7 +32,7 @@
     <symbol id="ph-floppy-disk-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M219.3,80.6l-44-44A15.9,15.9,0,0,0,164.7,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V91.3A15.9,15.9,0,0,0,219.3,80.6ZM160,200H96V144h64Zm16-88H80V48h80Z"/>
     </symbol>
-    <!-- Trash (rød stil via CSS) -->
+    <!-- Trash -->
     <symbol id="ph-trash-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M216,56H168V48a24,24,0,0,0-24-24H112A24,24,0,0,0,88,48v8H40a8,8,0,0,0,0,16h8V208a24,24,0,0,0,24,24H184a24,24,0,0,0,24-24V72h8a8,8,0,0,0,0-16ZM104,48a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8v8H104ZM176,208H80V72H176Z"/>
     </symbol>
@@ -45,7 +46,7 @@
     </symbol>
     <!-- Star (filled) -->
     <symbol id="ph-star-fill" viewBox="0 0 256 256" fill="#FFD54F" stroke="black" stroke-width="8">
-      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16,0,0,0,72,224.5L128,195l56,29.5a16.2,16.2,0,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
+      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16,0,0,0,72,224.5L128,195l56,29.5a16.2,16,2,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
     </symbol>
     <!-- Plus -->
     <symbol id="ph-plus" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
@@ -60,9 +61,12 @@
   <!-- TOPP -->
   <header class="topbar">
     <div class="brand">
-      assets/logo.png
+      <!-- RIKTIG: bruk <img> -->
+      <img src="assets/logo.png" alt="Logo" />
       <span>Styrketrening</span>
     </div>
+
+    <!-- Modulknapper (vises på brede skjermer) -->
     <nav class="nav" id="mainNav">
       <button data-route="dashboard" class="nav-btn active">Dashboard</button>
       <button data-route="library" class="nav-btn">Øktvelger</button>
@@ -70,9 +74,9 @@
       <button data-route="log" class="nav-btn">Logg</button>
     </nav>
 
-    <!-- HAMBURGER (vises på smal skjerm) -->
+    <!-- Hamburgermeny (vises når nav skjules på smal skjerm) -->
     <button id="hamburgerBtn" class="hamburger" aria-label="Meny">
-      <svg class="icon"><use href="#ph-list"></use></svg>
+      <svg class="icon"><use href="#ph-list"/></svg>
     </button>
     <div id="hamburgerMenu" class="hamburger-menu card" style="display:none;">
       <button data-route="dashboard" class="menu-item">Dashboard</button>
@@ -86,13 +90,12 @@
 
   <footer class="footer">© 2026</footer>
 
-  <!-- SCRIPTS -->
-  app.js</script>
-  modules/dashboard.js</script>
-  modules/library.js</script>
-  modules/editor.js</script>
-  modules/session.js</script>
-  modules/log.js</script>
+  <!-- RIKTIG: script-tag med src -->
+  <script src="app.js"></script>
+  <script src="modules/dashboard.js"></script>
+  <script src="modules/library.js"></script>
+  <script src="modules/editor.js"></script>
+  <script src="modules/session.js"></script>
+  <script src="modules/log.js"></script>
 </body>
 </html>
-``
