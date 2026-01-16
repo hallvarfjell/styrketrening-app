@@ -1,57 +1,72 @@
 
-:root {
-  --bg:#f9fafb; --fg:#222; --muted:#666;
-  --accent:#4c7a9f; --accent2:#c9a66b; --border:#e5e7eb;
-  --hotpink:#ff4fa3; --hotpink-dark:#e0448f;
+/* ========== Grunnleggende responsive inputs/bokser ========== */
+* { box-sizing: border-box; }
+.input, textarea { width: 100%; max-width: 100%; }
+textarea { resize: vertical; min-height: 80px; }
+
+/* Ens breddelogikk i kort: sørg for at innholdet aldri stikker utenfor */
+.card > .flex > .input,
+.card > .flex > select,
+.card .input { min-width: 0; }
+
+/* Grid → enkel kolonne på mobil */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 840px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* ========== Ikonknapper (konsistente på tvers) ========== */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: clamp(36px, 6vw, 40px); height: clamp(36px, 6vw, 40px);
+  border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer;
+  padding: 0; line-height: 0;
 }
+.icon-btn:hover { background: #f7f7f7; }
+.icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); margin:0; }
-.container { max-width:1000px; margin:0 auto; padding:16px; }
-.card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
-.flex { display:flex; gap:12px; flex-wrap:wrap; }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-@media (max-width:840px){ .grid-2 { grid-template-columns:1fr; } }
+.icon { width: clamp(18px, 3.3vw, 20px); height: clamp(18px, 3.3vw, 20px); }
 
-.topbar { position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; gap:12px; padding:10px 16px; z-index:10; }
-.topbar .brand { display:flex; align-items:center; gap:8px; font-weight:bold; }
-.topbar img { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); }
-.nav { display:flex; gap:8px; margin-left:auto; }
-.nav-btn { padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; }
-.nav-btn.active { border-color: var(--accent); color: var(--accent); }
+/* Play-knapp (grønn pil) */
+.icon-btn.play .icon { color: #1aaa55; }
 
-/* Hamburger: vises når nav skjules */
-.hamburger { display:none; margin-left:auto; padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; }
-.hamburger-menu { position:absolute; right:16px; top:56px; min-width:180px; }
-.menu-item { width:100%; text-align:left; padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; margin-bottom:8px; }
+/* Favorittstjerne (outline / aktiv) – svart ramme, gult fyll ved aktiv */
+.icon-btn.fav .icon { color: #000; }
+.icon-btn.fav.active .icon { color: #000; } /* stroke black (in sprite), fill i symbolet er gult */
 
-@media (max-width:620px){
-  .nav { display:none; }
-  .hamburger { display:block; }
+/* Tekst ved siden av ikoner (når aktuelt) */
+.icon-label { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ========== Topbar / Hamburger ========== */
+.hamburger { 
+  display: none; margin-left: auto; 
+  width: clamp(44px, 8vw, 48px); height: clamp(44px, 8vw, 48px);
+  border: 1px solid var(--border); border-radius: 10px; background: #fff; cursor: pointer;
 }
+.hamburger .icon { width: clamp(22px, 4vw, 26px); height: clamp(22px, 4vw, 26px); }
+@media (max-width: 620px){ .nav { display:none; } .hamburger { display:block; } }
 
-/* Inputs, knapper */
-.input { padding:6px 8px; border:1px solid var(--border); border-radius:8px; width:100%; }
-.button { background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
-.button.secondary { background:var(--accent2); }
-.small { color:var(--muted); font-size:12px; }
-.footer { text-align:center; padding:12px; color:var(--muted); }
+/* ========== Sesjon: “sexy” forbedringer ========== */
+.session-wrapper { transition: background 250ms ease; border-radius: 12px; }
+.session-wrapper.work  { background: #e7f8ee; } /* grønn bakgrunn i øvelse */
+.session-wrapper.pause { background: #f0faf4; } /* lysere grønn i pause */
 
-/* Progressbars – “sexy” for session */
-.progress { height:14px; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:#f3f4f6; }
-.progress .bar { height:100%; background: linear-gradient(90deg, #6aa7d1, #4c7a9f); width:0%; transition:width 0.3s ease; }
+.session-status { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.session-title  { font-size: 20px; font-weight: 700; margin-bottom: 6px; } /* samme str som før */
 
-/* Session: store tall & typografi */
-.session-timer { font-size:32px; font-weight:800; letter-spacing:1px; }
-.session-status { font-size:20px; font-weight:700; margin-bottom:6px; }
-.session-details { color:#444; }
+/* Progressbars */
+.progress { height: 14px; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: #f3f4f6; }
+.progress .bar { height: 100%; background: linear-gradient(90deg, #6aa7d1, #4c7a9f); width: 0%; transition: width 0.3s ease; }
 
-/* Favorittknapp – rosa når valgt + større stjerne */
-.fav-btn { background:#fff; color:#333; border:1px solid var(--border); }
-.fav-btn.active { background:var(--hotpink); color:#fff; border-color:var(--hotpink-dark); }
-.fav-btn .star { font-size:16px; margin-right:6px; }
-.fav-btn.active .star { font-size:18px; }
+/* “Rekkefølge kan endres” – visuelle hint i Editor */
+.item-card { position: relative; }
+.item-card::before {
+  content: '↕'; position: absolute; left: 8px; top: 8px; color: #999; font-size: 14px;
+}
+.item-card .input { padding-left: 20px; }
 
-/* Drag & drop markering */
-.draggable { cursor:grab; }
-.drag-over { outline:2px dashed var(--accent); border-radius:10px; }
+/* ========== Tekst/linje bryt i rader (Dashboard) ========== */
+.row { display: flex; align-items: center; gap: 8px; }
+.row .title { flex: 1 1 auto; min-width: 0; }
+.row .actions { flex: 0 0 auto; }
+
+/* ========== Logg-graf: større y-akse tall, ingen “Minutter”, ingen tall over stolper ========== */
+/* (Selve tegningen justeres i JS – her holder vi det visuelt rent) */
