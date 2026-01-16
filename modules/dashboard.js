@@ -15,13 +15,6 @@ const Dashboard = {
     }
     const favorites = (AppState.workouts || []).filter(w => w.favorite);
 
-    const section = (title, itemsHtml) => (
-      '<div>' +
-        (title ? '<h3>'+title+'</h3>' : '') +
-        itemsHtml +
-      '</div>'
-    );
-
     const recentHtml = lastThree.length
       ? lastThree.map(s =>
           '<div class="card">' +
@@ -29,7 +22,7 @@ const Dashboard = {
               '<div class="title"><strong>'+s.name+'</strong> <span class="small">('+Util.fmtMMSS(s.duration_sec)+')</span></div>' +
               '<div class="actions">' +
                 '<button class="icon-btn play" aria-label="Start igjen" data-wid="'+s.workout_id+'">' +
-                  '<svg class="icon"><use href="#icon-play"/></svg>' +
+                  '<svg class="icon"><use href="#ph-play-fill"/></svg>' +
                 '</button>' +
               '</div>' +
             '</div>' +
@@ -44,7 +37,7 @@ const Dashboard = {
               '<div class="title"><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span></div>' +
               '<div class="actions">' +
                 '<button class="icon-btn play" aria-label="Start" data-wid="'+w.workout_id+'">' +
-                  '<svg class="icon"><use href="#icon-play"/></svg>' +
+                  '<svg class="icon"><use href="#ph-play-fill"/></svg>' +
                 '</button>' +
               '</div>' +
             '</div>' +
@@ -52,7 +45,7 @@ const Dashboard = {
         ).join('')
       : '<div class="card small">Ingen favoritter. Merk i Øktvelger.</div>';
 
-    render('<div class="grid-2">' + section('Siste økter', recentHtml) + section('Favorittøkter', favHtml) + '</div>');
+    render('<div class="grid-2"><div><h3>Siste økter</h3>'+recentHtml+'</div><div><h3>Favorittøkter</h3>'+favHtml+'</div></div>');
 
     document.querySelectorAll('button[data-wid]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -68,5 +61,4 @@ const Dashboard = {
     });
   }
 };
-
 window.Dashboard = Dashboard;
