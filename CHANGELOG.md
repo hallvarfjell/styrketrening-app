@@ -193,10 +193,20 @@ Gjør et forsøk på å løse oppgaven en gang til. Ta utgangspunkt i filene sli
 
 Han gav meg en del ikonsett å velge mellom, men han satte også i gang med å lage nytt sett med filer, reversert en versjon. Så feilet kjøringen og jeg gav han promptet en gang til, med litt justering: "Noe veldig galt skjedde med utseendet her. Ta utgangspunkt i filene slik de var før mine forrige endringsønsker og gjør et forsøk på å løse oppgaven en gang til. Bruk ikonsett "Phosphor icons". Gi komplette versjon av alle filer jeg skal gjøre endringer i."
 
-Det kan virke som at jeg må gjøre en helt ny QA og nytt prompt for rev09 som inneholder en del av det jeg ba om i rev 08.
 XXXXX
 
-
+REV09:
+INDEX: Legg til hamburgermeny dersom skjermen appen vises på er for liten til å ha knapper
+DASHBOARD: Ingen endringer.
+ØKTVELGER: Filterknappen for valg av tilgjengelig utstyr har forsvunnet. Legg denne inn på nytt med samme funksjonalitet som før.
+EDITOR:
+- Feltbreddene er fortsatt alt for brede. Dessuten har feltet for "Bygg økt", "Legg til øvelse" og "Øvelsesbibbliotek" mye større bredde enn feltet me "Filter øvelser". Juster feltbreddene slik at de er like brede, og dersom det ikke er plass til to felt i bredden (Slik som på en mobiltelefon) skal feltene stables.
+- I "Bygg økt"-feltet skal "Fjern"-knappen erstattes med søppelkasse-ikonet. Videre skal pilen som indikerer at øvelsen kan flyttes være tydeligere og flyttes til lengst til høyre på høyde med øvelsesnavnet. "Lagre-økt" boksen skal erstattes med diskett-ikon.
+- "Legg til øvelse"-feltet skal de seks egenskapene (Varighet, Varighet pause, Fokusområde, Kategori, Intensitet og lydnivå) stå i to kolonner og på tre rader, istedetfor at alle står i en kolonne og seks rader. Feltet for inntasting av utstyr er borte, legg denne inn på nytt. Legg denne inn på nytt med samme funksjonalitet som før dvs at når man står i boksen skal alle verdier av utstyr som finnes i øvelseslista kunne velges.
+- I "Filter øvelser" feltet har filterknappen for valg av tilgjengelig utstyr har forsvunnet. Legg denne inn på nytt med samme funksjonalitet som før.
+LOGG:
+- Det forsvant en del gøy statistikk fra loggen i forrige revisjon, for eksempel Streak og Beste dag (med varighet og dato) Legg inn dette på nytt.
+- Teksten "Minutter" legger seg oppå verdiene på den loddrette aksen på stolpediagrammet. Dette gjør det vanskelig å lese. Endre dette.
 -------------------------
 REVXX
 GENERELT:
