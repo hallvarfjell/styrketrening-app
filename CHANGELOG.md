@@ -225,6 +225,9 @@ SESSION:
 LOGG:
 - Formatet på tid for snitt per dag skal være mm:ss uten desimaler.
 - Fjern teksten "minutter" på Y-aksen.
+
+REV11 (ikkje kjørt)
+SESSION: Melding om man prøver å navigere bort fra økta: "Økt kjører. Avslutt økta først."
 -------------------------
 REVXX
 GENERELT:
