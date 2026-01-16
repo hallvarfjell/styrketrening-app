@@ -17,7 +17,7 @@ const AppState = {
 };
 
 const Util = {
-  fmtMMSS(sec){ sec = Math.max(0, Number(sec)||0); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; },
+  fmtMMSS(sec){ sec = Math.max(0, Math.round(Number(sec)||0)); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; },
   parseMMSS(val){ const t=String(val||''); if(!t.includes(':')) return Number(t)||0; const [m,s]=t.split(':').map(Number); return (Number(m)||0)*60+(Number(s)||0); },
   parseCSV(text, delimiter=';'){
     const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length>0);
@@ -74,6 +74,10 @@ function navigate(route){
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
 
+  // Logo → Dashboard (uten reload)
+  const brand = document.getElementById('brandLink');
+  if (brand) brand.addEventListener('click', (e)=>{ e.preventDefault(); navigate('dashboard'); });
+
   // Hamburger wiring
   const hBtn  = document.getElementById('hamburgerBtn');
   const hMenu = document.getElementById('hamburgerMenu');
@@ -87,4 +91,3 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 window.AppState=AppState; window.Store=Store; window.Util=Util; window.navigate=navigate;
-``
