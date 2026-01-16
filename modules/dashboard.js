@@ -3,7 +3,6 @@
 
 const Dashboard = {
   render() {
-    // 3 siste unike
     const days = (AppState.logs || []).slice().reverse();
     const seen = new Set(), lastThree = [];
     for (const day of days) {
@@ -22,7 +21,7 @@ const Dashboard = {
               '<div class="title"><strong>'+s.name+'</strong> <span class="small">('+Util.fmtMMSS(s.duration_sec)+')</span></div>' +
               '<div class="actions">' +
                 '<button class="icon-btn play" aria-label="Start igjen" data-wid="'+s.workout_id+'">' +
-                  '<svg class="icon"><use href="#ph-play-fill"/></svg>' +
+                  '<svg class="icon"><use href="#ph-play-fill"></use></svg>' +
                 '</button>' +
               '</div>' +
             '</div>' +
@@ -37,7 +36,7 @@ const Dashboard = {
               '<div class="title"><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span></div>' +
               '<div class="actions">' +
                 '<button class="icon-btn play" aria-label="Start" data-wid="'+w.workout_id+'">' +
-                  '<svg class="icon"><use href="#ph-play-fill"/></svg>' +
+                  '<svg class="icon"><use href="#ph-play-fill"></use></svg>' +
                 '</button>' +
               '</div>' +
             '</div>' +
@@ -62,3 +61,4 @@ const Dashboard = {
   }
 };
 window.Dashboard = Dashboard;
+``
