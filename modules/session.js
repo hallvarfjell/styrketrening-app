@@ -25,8 +25,8 @@ const Session = {
     })();
 
     this.state = {
-      idx: -1,
-      phase: 'pause',
+      idx: -1,                   // -1: pre-start
+      phase: 'pause',            // 'pause' | 'work' | 'done'
       remainingInPhase: (w.items && w.items.length ? getPauseAfter(-1) : 10),
       remainingTotal: totalPlanned,
       running: false
@@ -35,8 +35,8 @@ const Session = {
     render(
       '<div class="grid-2">' +
         '<div>' +
-          '<div class="card">' +
-            '<div id="status" class="session-status">Gjør deg klar.</div>' +
+          '<div id="sessionWrap" class="card session-wrapper pause">' +
+            '<div id="status" class="session-title">Neste:</div>' +
             '<div id="details" class="session-details small"></div>' +
 
             '<div class="card">' +
@@ -54,11 +54,13 @@ const Session = {
             '<div class="small" style="color:#666; margin:6px 0;">Tips: Enter/Mellomrom = Pause/Gjenoppta · Piltaster = bytt øvelse</div>' +
 
             '<div class="flex">' +
-              '<button class="button" id="start">Start</button>' +
-              '<button class="button secondary" id="prev">Forrige</button>' +
-              '<button class="button secondary" id="next">Neste</button>' +
-              '<button class="button secondary" id="save">Lagre</button>' +
-              '<button class="button secondary" id="discard">Forkast</button>' +
+              '<button class="icon-btn play" id="start" aria-label="Start/Pause">' +
+                '<svg class="icon"><use href="#icon-play"/></svg>' +
+              '</button>' +
+              '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#icon-prev"/></svg></button>' +
+              '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#icon-next"/></svg></button>' +
+              '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#icon-save"/></svg></button>' +
+              '<button class="icon-btn" id="discard" aria-label="Forkast"><svg class="icon"><use href="#icon-trash"/></svg></button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -67,6 +69,8 @@ const Session = {
         '</div>' +
       '</div>'
     );
+
+    const wrap = document.getElementById('sessionWrap');
 
     const refreshListHl = () => {
       const list = document.getElementById('list');
@@ -80,8 +84,9 @@ const Session = {
 
     const updateStartBtn = () => {
       const b = document.getElementById('start');
-      if (this.state.phase === 'done') { b.textContent = '—'; b.disabled = true; return; }
-      b.textContent = this.state.running ? 'Pause' : (this.state.idx===-1 ? 'Start' : 'Gjenoppta');
+      const icon = b.querySelector('use');
+      if (this.state.phase === 'done') { b.disabled = true; return; }
+      icon.setAttribute('href', this.state.running ? '#icon-pause' : '#icon-play');
     };
 
     const currentPhaseTarget = () => {
@@ -97,18 +102,24 @@ const Session = {
       document.getElementById('barTotal').style.width = Math.min(100,(totalDone/totalPlanned)*100) + '%';
 
       if (this.state.phase === 'pause') {
-        document.getElementById('status').textContent = 'Gjør deg klar!';
+        wrap.classList.add('pause'); wrap.classList.remove('work');
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
         const next = w.items[nextIdx];
         if (next) {
           const e = AppState.exercises.find(x=>x.exercise_id===next.exercise_id);
-          document.getElementById('details').innerHTML = '<strong>Neste:</strong> '+(e?e.name:next.exercise_id)+'<br>'+(String(e?.description||'')).replace(/\n/g,'<br>');
-        } else document.getElementById('details').textContent = '';
+          document.getElementById('status').textContent = 'Neste: ' + (e?e.name:next.exercise_id);
+          document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
+        } else {
+          document.getElementById('status').textContent = 'Neste:';
+          document.getElementById('details').textContent = '';
+        }
       } else if (this.state.phase === 'work') {
+        wrap.classList.add('work'); wrap.classList.remove('pause');
         const it = w.items[this.state.idx]; const e  = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
-        document.getElementById('status').textContent = 'Kjør!';
-        document.getElementById('details').innerHTML  = '<strong>Øvelse:</strong> '+(e?e.name:it.exercise_id)+'<br>'+(String(e?.description||'')).replace(/\n/g,'<br>');
+        document.getElementById('status').textContent = 'Øvelse: ' + (e?e.name:it.exercise_id);
+        document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
       } else {
+        wrap.classList.remove('work'); wrap.classList.remove('pause');
         document.getElementById('status').textContent = 'Ferdig!';
         document.getElementById('details').textContent = '';
       }
@@ -157,7 +168,8 @@ const Session = {
       if (this.state.phase === 'work' && this.state.idx > 0) {
         this.state.idx -= 1; this.state.phase = 'work'; this.state.remainingInPhase = w.items[this.state.idx].duration_sec;
       } else {
-        this.state.idx = Math.max(-1, this.state.idx - 1); this.state.phase = 'pause'; this.state.remainingInPhase = (this.state.idx<0 ? getPauseAfter(-1) : getPauseAfter(this.state.idx));
+        this.state.idx = Math.max(-1, this.state.idx - 1);
+        this.state.phase = 'pause'; this.state.remainingInPhase = (this.state.idx<0 ? getPauseAfter(-1) : getPauseAfter(this.state.idx));
       }
       this.state.remainingTotal = totalPlanned; updateUI();
     };
@@ -178,7 +190,6 @@ const Session = {
     document.getElementById('prev').onclick   = skipPrev;
     document.getElementById('next').onclick   = skipNext;
     document.getElementById('save').onclick   = () => {
-      // Bekreft hvis økta ikke er ferdig
       if (this.state.phase !== 'done') {
         if (!confirm('Stoppe og lagre økta?')) return;
         this.stop();
@@ -188,8 +199,7 @@ const Session = {
       if (!AppState.logs.find(d=>d.date===dateStr)) AppState.logs.push(day);
       day.sessions.push({ workout_id: w.workout_id, name: w.name, start_time_local: today.toISOString(), duration_sec: totalPlanned, computed_hr_bpm: 90, events: [] });
       Store.save(Store.keys.logs, AppState.logs);
-      alert('Økt lagret i logg.');
-      navigate('log');
+      alert('Økt lagret i logg.'); navigate('log');
     };
     document.getElementById('discard').onclick= () => { if (confirm('Forkaste økta?')) { this.stop(); navigate('dashboard'); } };
 
@@ -205,3 +215,4 @@ const Session = {
 };
 
 window.Session = Session;
+``
