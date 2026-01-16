@@ -1,7 +1,7 @@
 
 // modules/library.js
 
-// ---- PREDEFINERT (kan redigeres) ----
+// Predefinerte (om tom lagring). Juster ved behov.
 const PREDEF_EXERCISES_CSV = `exercise_id;name;description;default_duration_sec;default_pause_sec;intensitet;category;focus_area;equipment;noise_level
 EX100;Knebøy;Stå støtt, senk hoftene og press opp.;60;10;Middels;Styrke/Spenst;Underkropp;;Medium
 EX101;Push-up;Stram kjernen og hold linje gjennom kroppen.;45;10;Middels;Styrke/Spenst;Overkropp;;Medium
@@ -14,17 +14,17 @@ function seedPredefinedIfEmpty() {
   const hasEx = (AppState.exercises || []).length > 0;
   const hasWk = (AppState.workouts  || []).length > 0;
   if (!hasEx && PREDEF_EXERCISES_CSV.trim()) {
-    const rows = Util.parseCSV(PREDEF_EXERCISES_CSV,';');
+    const rows = Util.parseCSV(PREDEF_EXERCISES_CSV, ';');
     AppState.exercises = rows.map(r => {
       const eq = (r.equipment||'').replace(/;/g,',').split(',').map(x=>x.trim()).filter(Boolean);
-      const intens = (r.intensitet||'').trim(); // Lav/Middels/Høy
+      const intens = (r.intensitet||'').trim();
       const rpeText = intens==='Lav'?'Lett': intens==='Middels'?'Moderat':'Hardt';
-      const rpeNum = rpeText==='Lett'?2: rpeText==='Moderat'?5:8;
+      const rpeNum  = rpeText==='Lett'?2:(rpeText==='Moderat'?5:8);
       return {
         exercise_id: r.exercise_id||('EX'+Date.now()),
         name: r.name, description: r.description||'',
         default_duration_sec: Number(r.default_duration_sec||60),
-        default_pause_sec: Number(r.default_pause_sec||10),
+        default_pause_sec:    Number(r.default_pause_sec||10),
         rpe: rpeNum, rpe_text: rpeText,
         category: r.category||'', focus_area: r.focus_area||'Hele kroppen',
         equipment: eq, noise_level: r.noise_level||'Medium', created_at: Date.now()
@@ -33,7 +33,7 @@ function seedPredefinedIfEmpty() {
     Store.save(Store.keys.exercises, AppState.exercises);
   }
   if (!hasWk && PREDEF_WORKOUTS_CSV.trim()) {
-    const rows = Util.parseCSV(PREDEF_WORKOUTS_CSV,';');
+    const rows = Util.parseCSV(PREDEF_WORKOUTS_CSV, ';');
     AppState.workouts = rows.map(r => ({
       workout_id: r.workout_id||('WK'+Date.now()),
       name:r.name, category:r.category||'', focus_area:r.focus_area||'Hele kroppen',
@@ -48,18 +48,29 @@ function seedPredefinedIfEmpty() {
   }
 }
 
+function downloadCsvSafe(filename, csv) {
+  if (typeof Util?.download === 'function') {
+    Util.download(filename, csv, 'text/csv;charset=utf-8');
+  } else {
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+  }
+}
+
 const Library = {
   render(){
     seedPredefinedIfEmpty();
+
+    // Fokusverdier fra øvelsesbiblioteket
+    const focusSet = new Set((AppState.exercises||[]).map(e=>e.focus_area).filter(Boolean));
+    const allFocus = Array.from(focusSet).sort((a,b)=>String(a).localeCompare(String(b)));
 
     // Utstyr (multivalg)
     const eqSet = new Set();
     (AppState.exercises||[]).forEach(e => (e.equipment||[]).forEach(x=>{ if(x) eqSet.add(x); }));
     const allEquipment = Array.from(eqSet).sort();
-
-    // Fokus fra øvelser
-    const focusSet = new Set((AppState.exercises||[]).map(e=>e.focus_area).filter(Boolean));
-    const allFocus = Array.from(focusSet).sort((a,b)=>String(a).localeCompare(String(b)));
 
     // Kategorier fra økter
     const catSet = new Set((AppState.workouts||[]).map(w=>w.category).filter(Boolean));
@@ -130,17 +141,22 @@ const Library = {
 
       const html=list.map(w=>{
         const req=getEquipForWorkout(w);
-        const favClass=w.favorite?'fav-btn active':'fav-btn';
-        const favLabel=w.favorite?'<span class="star">★</span> Favoritt':'<span class="star">☆</span> Merk favoritt';
         return (
           '<div class="card">' +
-            '<div><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span></div>' +
-            '<div class="small">Utstyr: '+(req.length?req.join(', '):'ingen')+'</div>' +
-            '<div class="flex">' +
-              '<button class="button" data-start="'+w.workout_id+'">Start</button>' +
-              '<button class="button secondary '+favClass+'" data-fav="'+w.workout_id+'">'+favLabel+'</button>' +
-              '<button class="button secondary" data-edit="'+w.workout_id+'">Rediger</button>' +
-              '<button class="button secondary" data-del="'+w.workout_id+'">Slett</button>' +
+            '<div class="row">' +
+              '<div class="title"><strong>'+w.name+'</strong> <span class="small">'+(w.category||'')+' • '+(w.focus_area||'')+'</span><div class="small">Utstyr: '+(req.length?req.join(', '):'ingen')+'</div></div>' +
+              '<div class="actions" style="display:flex;gap:8px;">' +
+                // Start (grønn play)
+                '<button class="icon-btn play" aria-label="Start" data-start="'+w.workout_id+'"><svg class="icon"><use href="#icon-play"/></svg></button>' +
+                // Rediger (blyant)
+                '<button class="icon-btn" aria-label="Rediger" data-edit="'+w.workout_id+'"><svg class="icon"><use href="#icon-pencil"/></svg></button>' +
+                // Slett (søppelspann)
+                '<button class="icon-btn" aria-label="Slett" data-del="'+w.workout_id+'"><svg class="icon"><use href="#icon-trash"/></svg></button>' +
+                // Favoritt (stjerne — outline/filled)
+                '<button class="icon-btn fav '+(w.favorite?'active':'')+'" aria-label="Favoritt" data-fav="'+w.workout_id+'">' +
+                  '<svg class="icon"><use href="#'+(w.favorite?'icon-star-filled':'icon-star-outline')+'"/></svg>' +
+                '</button>' +
+              '</div>' +
             '</div>' +
           '</div>'
         );
@@ -149,9 +165,9 @@ const Library = {
       document.getElementById('wklist').innerHTML = html || '<div class="card small">Ingen økter matcher filteret.</div>';
 
       document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.start); AppState.currentWorkout=w; AppState.autostart=true; Session.render(); setActive('none'); });
-      document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.fav); if(w){w.favorite=!w.favorite; Store.save(Store.keys.workouts, AppState.workouts); refreshList(); }});
       document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.edit); Editor.render(w); setActive('editor'); });
-      document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const wid=b.dataset.del; const idx=AppState.workouts.findIndex(x=>x.workout_id===wid); if(idx>=0 && confirm('Slette økta?')){ AppState.workouts.splice(idx,1); Store.save(Store.keys.workouts, AppState.workouts); refreshList(); }});
+      document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const wid=b.dataset.del; const idx=AppState.workouts.findIndex(x=>x.workout_id===wid); if(idx>=0&&confirm('Slette økta?')){ AppState.workouts.splice(idx,1); Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }});
+      document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{ const w=AppState.workouts.find(x=>x.workout_id===b.dataset.fav); if(w){ w.favorite=!w.favorite; Store.save(Store.keys.workouts,AppState.workouts); refreshList(); }});
     }
 
     // Import/eksport
@@ -179,7 +195,8 @@ const Library = {
       const rows=(AppState.workouts||[]).map(w=>[
         w.workout_id,w.name,w.category,w.focus_area,w.favorite,w.pause_between_items_sec,(w.items||[]).map(i=>i.exercise_id+':'+i.duration_sec).join('|')
       ]);
-      const csv=Util.toCSV(headers,rows,';'); Util.download('workouts.csv',csv,'text/csv');
+      const csv=Util.toCSV(headers,rows,';');
+      downloadCsvSafe('workouts.csv', csv); // robust fallback
     };
 
     refreshList();
@@ -188,4 +205,4 @@ const Library = {
     document.getElementById('filterName').oninput=refreshList;
   }
 };
-window.Library=Library;
+window.Library = Library;
