@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Styrketreningsapp</title>
-  <link rel="stylesheet" href="style.css" />
+  style.css
 </head>
 <body>
 
@@ -31,7 +31,7 @@
     <symbol id="ph-floppy-disk-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M219.3,80.6l-44-44A15.9,15.9,0,0,0,164.7,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V91.3A15.9,15.9,0,0,0,219.3,80.6ZM160,200H96V144h64Zm16-88H80V48h80Z"/>
     </symbol>
-    <!-- Trash -->
+    <!-- Trash (rød stil via CSS) -->
     <symbol id="ph-trash-fill" viewBox="0 0 256 256" fill="currentColor">
       <path d="M216,56H168V48a24,24,0,0,0-24-24H112A24,24,0,0,0,88,48v8H40a8,8,0,0,0,0,16h8V208a24,24,0,0,0,24,24H184a24,24,0,0,0,24-24V72h8a8,8,0,0,0,0-16ZM104,48a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8v8H104ZM176,208H80V72H176Z"/>
     </symbol>
@@ -45,18 +45,22 @@
     </symbol>
     <!-- Star (filled) -->
     <symbol id="ph-star-fill" viewBox="0 0 256 256" fill="#FFD54F" stroke="black" stroke-width="8">
-      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16.1,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16.2,0,0,0,72,224.5L128,195l56,29.5a16.2,16.2,0,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
+      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16,0,0,0,72,224.5L128,195l56,29.5a16.2,16.2,0,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
     </symbol>
     <!-- Plus -->
     <symbol id="ph-plus" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
       <path d="M128 40v176M40 128h176"/>
+    </symbol>
+    <!-- Hamburger / List -->
+    <symbol id="ph-list" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 64h176M40 128h176M40 192h176"/>
     </symbol>
   </svg>
 
   <!-- TOPP -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo.png" alt="logo" />
+      assets/logo.png
       <span>Styrketrening</span>
     </div>
     <nav class="nav" id="mainNav">
@@ -65,6 +69,17 @@
       <button data-route="editor" class="nav-btn">Editor</button>
       <button data-route="log" class="nav-btn">Logg</button>
     </nav>
+
+    <!-- HAMBURGER (vises på smal skjerm) -->
+    <button id="hamburgerBtn" class="hamburger" aria-label="Meny">
+      <svg class="icon"><use href="#ph-list"></use></svg>
+    </button>
+    <div id="hamburgerMenu" class="hamburger-menu card" style="display:none;">
+      <button data-route="dashboard" class="menu-item">Dashboard</button>
+      <button data-route="library" class="menu-item">Øktvelger</button>
+      <button data-route="editor" class="menu-item">Editor</button>
+      <button data-route="log" class="menu-item">Logg</button>
+    </div>
   </header>
 
   <main id="app" class="container"></main>
@@ -72,11 +87,12 @@
   <footer class="footer">© 2026</footer>
 
   <!-- SCRIPTS -->
-  <script src="app.js"></script>
-  <script src="modules/dashboard.js"></script>
-  <script src="modules/library.js"></script>
-  <script src="modules/editor.js"></script>
-  <script src="modules/session.js"></script>
-  <script src="modules/log.js"></script>
+  app.js</script>
+  modules/dashboard.js</script>
+  modules/library.js</script>
+  modules/editor.js</script>
+  modules/session.js</script>
+  modules/log.js</script>
 </body>
 </html>
+``
