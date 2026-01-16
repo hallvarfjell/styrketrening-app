@@ -2,7 +2,7 @@
 // modules/editor.js
 //
 // Robust Editor med:
-// - Lik kortbredde styrt av CSS (grid-2, card {width:100%})
+// - Lik kortbredde styrt av CSS (grid-2, .card {width:100%})
 // - Bygg økt: Fokusområde uten forhåndsverdi; Lagre = diskett-ikon
 // - Item-kort: drag-håndtak (↕) til høyre; Fjern = rødt søppelspann-ikon
 // - Lag/rediger øvelse: 2 kolonner × 3 rader for seks egenskaper; utstyr-velger
@@ -45,6 +45,7 @@ const Editor = {
       let s=''; for(const v of arr){ s += '<option value="'+v+'">'; } return s;
     }
 
+    // === HTML markup ===
     const html =
       '<div class="grid-2">' +
         '<div>' +
@@ -62,7 +63,7 @@ const Editor = {
             '<div id="items" style="margin-top:8px;"></div>' +
             '<div class="flex" style="margin-top:8px;">' +
               '<button class="icon-btn" id="save" aria-label="Lagre økt">' +
-                '<svg class="icon"><use href="#ph-floppy-disk-fill"></use></svg>' +
+                '<svg class="icon"><use href="#ph-floppy-disk-fill"/></svg>' +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -150,13 +151,17 @@ const Editor = {
 
     render(html);
 
-    // === Ny øvelse: utstyr multivalg ===
+    // === Ny øvelse: utstyr multivalg (venstre) ===
     const newEqBtn  = document.getElementById('newEqBtn');
     const newEqMenu = document.getElementById('newEqMenu');
     const newEqHint = document.getElementById('newEqHint');
     newEqBtn.onclick = () => { newEqMenu.style.display = (newEqMenu.style.display==='none' ? 'block' : 'none'); };
+
     let newSelectedEquip = new Set();
-    function updateNewEquipHint(){ const arr=[...newSelectedEquip]; newEqHint.textContent = arr.length ? arr.join(', ') : 'Kun kroppsvekt'; }
+    function updateNewEquipHint(){
+      const arr=[...newSelectedEquip];
+      newEqHint.textContent = arr.length ? arr.join(', ') : 'Kun kroppsvekt';
+    }
     const newEqAll = document.getElementById('newEqAll');
     newEqAll.onchange = () => {
       newSelectedEquip = new Set(newEqAll.checked ? allEquipment : []);
@@ -251,7 +256,7 @@ const Editor = {
       const pauseV = (document.getElementById('new_pause').value||'').trim();
       const focus  = (document.getElementById('new_focus').value||'').trim();
       const cat    = (document.getElementById('new_cat').value  ||'').trim();
-      const intens = document.getElementById('new_intensity').value;
+      const intens = document.getElementById('new_intensity').value;   // Lav/Middels/Høy
       const noise  = (document.getElementById('new_noise').value||'').trim();
 
       const missing=[]; if(!name)missing.push('Navn'); if(!desc)missing.push('Beskrivelse'); if(!intens)missing.push('Intensitet'); if(!cat)missing.push('Kategori'); if(!focus)missing.push('Fokusområde'); if(!noise)missing.push('Lydnivå');
@@ -286,8 +291,14 @@ const Editor = {
     const fEqBtn  = document.getElementById('fEqBtn');
     const fEqMenu = document.getElementById('fEqMenu');
     const fEqHint = document.getElementById('fEqHint');
+
+    // Viktig: fSelectedEquip deklareres KUN én gang her (IKKE på nytt senere)
     let fSelectedEquip = new Set();
-    function updateFilterEquipHint(){ const a=[...fSelectedEquip]; fEqHint.textContent = a.length ? a.join(', ') : 'kun kroppsvekt'; }
+    function updateFilterEquipHint(){
+      const a=[...fSelectedEquip];
+      if (fEqHint) fEqHint.textContent = a.length ? a.join(', ') : 'kun kroppsvekt';
+    }
+
     fEqBtn.onclick = () => { fEqMenu.style.display = (fEqMenu.style.display==='none' ? 'block' : 'none'); };
     const fEqAll = document.getElementById('fEqAll');
     fEqAll.onchange = () => {
@@ -329,7 +340,6 @@ const Editor = {
       list.sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0));
       let html='';
       for (const e of list){
-        const dur=Number(e.default_duration_sec||60);
         html+=
           '<div class="card">' +
             '<div class="row">' +
@@ -338,9 +348,9 @@ const Editor = {
                 '<div class="small">'+(String(e.description||'').replace(/\n/g,'<br>'))+'</div>' +
               '</div>' +
               '<div class="actions">' +
-                '<button class="icon-btn" aria-label="Legg til i økt" data-add="'+e.exercise_id+'"><svg class="icon"><use href="#ph-plus"></use></svg></button>' +
-                '<button class="icon-btn" aria-label="Rediger" data-edit="'+e.exercise_id+'"><svg class="icon"><use href="#ph-pencil-fill"></use></svg></button>' +
-                '<button class="icon-btn trash" aria-label="Slett" data-del="'+e.exercise_id+'"><svg class="icon"><use href="#ph-trash-fill"></use></svg></button>' +
+                '<button class="icon-btn" aria-label="Legg til i økt" data-add="'+e.exercise_id+'"><svg class="icon"><use href="#ph-plus"/></svg></button>' +
+                '<button class="icon-btn" aria-label="Rediger" data-edit="'+e.exercise_id+'"><svg class="icon"><use href="#ph-pencil-fill"/></svg></button>' +
+                '<button class="icon-btn trash" aria-label="Slett" data-del="'+e.exercise_id+'"><svg class="icon"><use href="#ph-trash-fill"/></svg></button>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -432,7 +442,7 @@ const Editor = {
             '</div>' +
             '<div class="flex" style="margin-top:8px;">' +
               '<button class="icon-btn trash" aria-label="Fjern" data-del="'+idx+'">' +
-                '<svg class="icon"><use href="#ph-trash-fill"></use></svg>' +
+                '<svg class="icon"><use href="#ph-trash-fill"/></svg>' +
               '</button>' +
             '</div>' +
           '</div>';
@@ -452,9 +462,6 @@ const Editor = {
     }
 
     // Init filter + lister
-    function updateFilterEquipHint(){ const a=[...fSelectedEquip]; const el=document.getElementById('fEqHint'); if (el) el.textContent = a.length ? a.join(', ') : 'kun kroppsvekt'; }
-    let fSelectedEquip = new Set();
-
     renderExercises(); renderItems();
 
     document.getElementById('fFocus').onchange = renderExercises;
@@ -509,4 +516,3 @@ const Editor = {
 };
 
 window.Editor = Editor;
-``
