@@ -1,12 +1,27 @@
 
 // modules/session.js
-//
-// Ikonknapper (Phosphor): start/pause, forrige/neste (dobbel pil), lagre (diskett), forkast (søppelspann).
-// Status-tekst: “Neste: …” i pause, “Øvelse: …” i arbeid.
 
 const Session = {
   timer: null,
   state: null,
+  audioCtx: null,
+
+  _ding(){
+    try{
+      if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = this.audioCtx;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = 880; // A5
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      const now = ctx.currentTime;
+      g.gain.exponentialRampToValueAtTime(0.2, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.20);
+      o.stop(now + 0.21);
+    }catch(e){ /* lyd ikke kritisk */ }
+  },
 
   render() {
     const w = AppState.currentWorkout;
@@ -28,48 +43,47 @@ const Session = {
     })();
 
     this.state = {
-      idx: -1,
-      phase: 'pause',
+      idx: -1, phase: 'pause',
       remainingInPhase: (w.items && w.items.length ? getPauseAfter(-1) : 10),
       remainingTotal: totalPlanned,
       running: false
     };
 
+    // Stakket layout: først session-kort, så liste under
     render(
-      '<div class="grid-2">' +
-        '<div>' +
+      '<div>' +
+        '<div id="sessionWrap" class="card session-card pause">' +
+          '<div id="status" class="session-status">Neste:</div>' +
+          '<div id="details" class="session-details small"></div>' +
+
           '<div class="card">' +
-            '<div id="status" class="session-status">Neste:</div>' +
-            '<div id="details" class="session-details small"></div>' +
+            '<div class="small">Gjeldende fase</div>' +
+            '<div class="progress"><div id="barPhase" class="bar"></div></div>' +
+            '<div id="timePhase" class="session-timer">00:00</div>' +
+          '</div>' +
 
-            '<div class="card">' +
-              '<div class="small">Gjeldende fase</div>' +
-              '<div class="progress"><div id="barPhase" class="bar"></div></div>' +
-              '<div id="timePhase" class="session-timer">00:00</div>' +
-            '</div>' +
+          '<div class="card">' +
+            '<div class="small">Hele økta (nedtelling)</div>' +
+            '<div class="progress"><div id="barTotal" class="bar"></div></div>' +
+            '<div id="timeTotal" class="session-timer">00:00</div>' +
+          '</div>' +
 
-            '<div class="card">' +
-              '<div class="small">Hele økta (nedtelling)</div>' +
-              '<div class="progress"><div id="barTotal" class="bar"></div></div>' +
-              '<div id="timeTotal" class="session-timer">00:00</div>' +
-            '</div>' +
+          '<div class="small" style="color:#666; margin:6px 0;">Tips: Enter/Mellomrom = Start/Pause · Piltaster = bytt øvelse</div>' +
 
-            '<div class="small" style="color:#666; margin:6px 0;">Tips: Enter/Mellomrom = Start/Pause · Piltaster = bytt øvelse</div>' +
-
-            '<div class="flex">' +
-              '<button class="icon-btn play" id="start" aria-label="Start/Pause"><svg class="icon"><use href="#ph-play-fill"/></svg></button>' +
-              '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#ph-caret-double-left-fill"/></svg></button>' +
-              '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#ph-caret-double-right-fill"/></svg></button>' +
-              '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#ph-floppy-disk-fill"/></svg></button>' +
-              '<button class="icon-btn" id="discard" aria-label="Forkast"><svg class="icon"><use href="#ph-trash-fill"/></svg></button>' +
-            '</div>' +
+          '<div class="flex">' +
+            '<button class="icon-btn play" id="start" aria-label="Start/Pause"><svg class="icon"><use href="#ph-play-fill"></use></svg></button>' +
+            '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#ph-caret-double-left-fill"></use></svg></button>' +
+            '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#ph-caret-double-right-fill"></use></svg></button>' +
+            '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#ph-floppy-disk-fill"></use></svg></button>' +
+            '<button class="icon-btn trash" id="discard" aria-label="Forkast"><svg class="icon"><use href="#ph-trash-fill"></use></svg></button>' +
           '</div>' +
         '</div>' +
-        '<div>' +
-          '<div class="card" id="list"></div>' +
-        '</div>' +
+
+        '<div class="card" id="list" style="margin-top:12px;"></div>' +
       '</div>'
     );
+
+    const wrap = document.getElementById('sessionWrap');
 
     const refreshListHl = () => {
       const list = document.getElementById('list');
@@ -81,10 +95,10 @@ const Session = {
     };
     refreshListHl();
 
-    const updateStartBtn = () => {
-      const b = document.getElementById('start').querySelector('use');
-      if (this.state.phase === 'done') { return; }
-      b.setAttribute('href', this.state.running ? '#ph-pause-fill' : '#ph-play-fill');
+    const updateStartIcon = () => {
+      const useEl = document.querySelector('#start use');
+      if (!useEl) return;
+      useEl.setAttribute('href', this.state.running ? '#ph-pause-fill' : '#ph-play-fill');
     };
 
     const currentPhaseTarget = () => {
@@ -100,6 +114,7 @@ const Session = {
       document.getElementById('barTotal').style.width = Math.min(100,(totalDone/totalPlanned)*100) + '%';
 
       if (this.state.phase === 'pause') {
+        wrap.classList.add('pause'); wrap.classList.remove('work');
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
         const next = w.items[nextIdx];
         if (next) {
@@ -111,10 +126,12 @@ const Session = {
           document.getElementById('details').textContent = '';
         }
       } else if (this.state.phase === 'work') {
+        wrap.classList.add('work'); wrap.classList.remove('pause');
         const it = w.items[this.state.idx]; const e  = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
         document.getElementById('status').textContent = 'Øvelse: ' + (e?e.name:it.exercise_id);
         document.getElementById('details').innerHTML  = (String(e?.description||'')).replace(/\n/g,'<br>');
       } else {
+        wrap.classList.remove('work'); wrap.classList.add('pause');
         document.getElementById('status').textContent = 'Ferdig!';
         document.getElementById('details').textContent = '';
       }
@@ -126,10 +143,13 @@ const Session = {
       document.getElementById('barPhase').style.width = Math.min(100,(phaseDone/phaseTarget)*100) + '%';
 
       refreshListHl();
-      updateStartBtn();
+      updateStartIcon();
     };
 
     const nextPhase = () => {
+      // lydsignal ved fasebytte
+      this._ding();
+
       if (this.state.phase === 'pause') {
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
         if (nextIdx >= w.items.length) {
@@ -154,9 +174,9 @@ const Session = {
       this.state.running = !this.state.running;
       if (this.state.running) this.timer = setInterval(step, 1000);
       else clearInterval(this.timer);
-      updateStartBtn();
+      updateStartIcon();
     };
-    this.stop = () => { this.state.running=false; clearInterval(this.timer); updateStartBtn(); };
+    this.stop = () => { this.state.running=false; clearInterval(this.timer); updateStartIcon(); };
 
     const skipPrev = () => {
       if (this.state.phase === 'done') return;
@@ -208,5 +228,4 @@ const Session = {
     updateUI();
   }
 };
-
 window.Session = Session;
