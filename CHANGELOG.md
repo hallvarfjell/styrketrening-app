@@ -226,11 +226,32 @@ LOGG:
 - Formatet på tid for snitt per dag skal være mm:ss uten desimaler.
 - Fjern teksten "minutter" på Y-aksen.
 
-REV11 (ikkje kjørt)
-Index.html: Jeg har lagt inn følgende kode for å få inn favicon i appen: [kode]
+REV11
+Index.html: Jeg har lagt inn følgende kode i <head> for å få inn favicon i appen: 
+
+--------------------
+--------------------
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Styrketreningsapp</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Favicon linker -->
+<link rel="icon" type="image/png" href="assets/favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg" />
+<link rel="shortcut icon" href="assets/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Styrke" />
+<link rel="manifest" href="assets/favicon/site.webmanifest" />
+
+</head>
+<body>
+--------------------
+--------------------
 
 SESSION:
-- Gi feilmelding dersom man prøver å navigere seg bort fra modulen før den er ferdig: "Økt kjører. Avslutt økta først."
+- Gi feilmelding dersom man prøver å navigere seg bort fra modulen før den er ferdig (Det skal ikke være mulig å navigere seg bort uten å ha lagret eller forkastet økta først): "Økt kjører. Avslutt økta først."
 - Jeg liker den grønne ramma når øvelsen er i gang. Jeg ønsker også at øvelsesfeltet har bakgrunnsfarge lik som rammen men med 80% gjennomsiktighet. Jeg ønsker den samme for pausene, bare med gul-oransj farge. Knappene for start, forrige, neste, lagre og slett skal ikke ha bakgrunnsfarge. Heller ikke feltene for nedtellingstidtakerene.
 - Jeg ønsker mye høyere lyd i faseoverganger, og gjerne en lyd som høres ut som en bjelle. Det er vikrigere at dette fungerer på en mobil enn på PCen.
 - Skriftstørrelser:
