@@ -1,14 +1,13 @@
 
 // modules/editor.js
 //
-// Robust Editor med:
-// - Lik kortbredde styrt av CSS (grid-2, .card {width:100%})
 // - Bygg økt: Fokusområde uten forhåndsverdi; Lagre = diskett-ikon
-// - Item-kort: drag-håndtak (↕) til høyre; Fjern = rødt søppelspann-ikon
-// - Lag/rediger øvelse: 2 kolonner × 3 rader for seks egenskaper; utstyr-velger
-// - Øvelser (høyre): fullt filter inkl. utstyrsfilter; pluss/blyant/søppelspann-ikoner
+// - Item-kort: drag-håndtak (↕) til høyre; Fjern = rødt søppelspann-ikon, flyttet opp på linje med feltene
+// - Tom økt-tekst: "Legg til med [pluss-ikon] i øvelseslista."
+// - Ny knapp "Kopier serie" dupliserer hele økta under
+// - Lag/rediger øvelse: 2 kolonner × 3 rader; utstyr-velger
+// - Øvelser (høyre): filter m/utstyr; pluss/blyant/søppelspann-ikoner
 // - Import/eksport av øvelser (inkl. default_pause_sec og intensitet)
-// - Korrekt SVG-syntaks (use href="#ph-...") og ingen HTML-kommentarer i JS
 
 const Editor = {
   render(existing = null) {
@@ -16,7 +15,7 @@ const Editor = {
       workout_id: `WK${Date.now()}`,
       name: '',
       category: '',
-      focus_area: '', // bevisst tom ved start
+      focus_area: '', // tom ved start
       favorite: false,
       items: [],
       created_at: Date.now()
@@ -35,17 +34,12 @@ const Editor = {
     const defaultFocus = ['Hele kroppen','Overkropp','Underkropp'];
     const allFocus = focusSet.size ? Array.from(focusSet).sort((a,b)=>String(a).localeCompare(String(b))) : defaultFocus;
     const preferNoise = ['Lavt','Medium','Høyt'];
-    const restNoise = Array.from(noiseSet).filter(n => !preferNoise.includes(n)).sort((a,b)=>String(a).localeCompare(String(b)));
+    const restNoise = Array.from(noiseSet).filter(n=>!preferNoise.includes(n)).sort((a,b)=>String(a).localeCompare(String(b)));
     const allNoise = preferNoise.concat(restNoise);
 
-    function optionsSimple(arr, selectedVal){
-      let s=''; for(const v of arr){ s += '<option'+(selectedVal===v?' selected':'')+'>'+v+'</option>'; } return s;
-    }
-    function dataListOptions(arr){
-      let s=''; for(const v of arr){ s += '<option value="'+v+'">'; } return s;
-    }
+    function optionsSimple(arr, selectedVal){ let s=''; for(const v of arr){ s+='<option'+(selectedVal===v?' selected':'')+'>'+v+'</option>'; } return s; }
+    function dataListOptions(arr){ let s=''; for(const v of arr){ s+='<option value="'+v+'">'; } return s; }
 
-    // === HTML markup ===
     const html =
       '<div class="grid-2">' +
         '<div>' +
@@ -63,7 +57,7 @@ const Editor = {
             '<div id="items" style="margin-top:8px;"></div>' +
             '<div class="flex" style="margin-top:8px;">' +
               '<button class="icon-btn" id="save" aria-label="Lagre økt">' +
-                '<svg class="icon"><use href="#ph-floppy-disk-fill"/></svg>' +
+                '<svg class="icon"><use href="#ph-floppy-disk-fill"></use></svg>' +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -89,7 +83,7 @@ const Editor = {
               '</select>' +
             '</div>' +
 
-            // Utstyr-velger
+            // Utstyr-velger (dropdown)
             '<div class="multiselect" style="margin-top:8px;">' +
               '<button id="newEqBtn" class="input">Velg utstyr</button>' +
               '<div id="newEqMenu" class="card" style="display:none; position:relative; z-index:5; max-width:520px;">' +
@@ -131,7 +125,7 @@ const Editor = {
               '<select id="fNoise" class="input"><option value="">Lydnivå (alle)</option>'+ (function(){let s=''; for(const n of allNoise){ s+='<option value="'+n+'">'+n+'</option>'; } return s; })() +'</select>' +
             '</div>' +
 
-            // Utstyrsfilter
+            // Utstyrsfilter (dropdown)
             '<div class="multiselect" style="margin-top:8px;">' +
               '<button id="fEqBtn" class="input">Tilgjengelig utstyr</button>' +
               '<div id="fEqMenu" class="card" style="display:none; position:relative; z-index:5; max-width:520px;">' +
@@ -158,10 +152,7 @@ const Editor = {
     newEqBtn.onclick = () => { newEqMenu.style.display = (newEqMenu.style.display==='none' ? 'block' : 'none'); };
 
     let newSelectedEquip = new Set();
-    function updateNewEquipHint(){
-      const arr=[...newSelectedEquip];
-      newEqHint.textContent = arr.length ? arr.join(', ') : 'Kun kroppsvekt';
-    }
+    function updateNewEquipHint(){ const arr=[...newSelectedEquip]; newEqHint.textContent = arr.length ? arr.join(', ') : 'Kun kroppsvekt'; }
     const newEqAll = document.getElementById('newEqAll');
     newEqAll.onchange = () => {
       newSelectedEquip = new Set(newEqAll.checked ? allEquipment : []);
@@ -256,7 +247,7 @@ const Editor = {
       const pauseV = (document.getElementById('new_pause').value||'').trim();
       const focus  = (document.getElementById('new_focus').value||'').trim();
       const cat    = (document.getElementById('new_cat').value  ||'').trim();
-      const intens = document.getElementById('new_intensity').value;   // Lav/Middels/Høy
+      const intens = document.getElementById('new_intensity').value;
       const noise  = (document.getElementById('new_noise').value||'').trim();
 
       const missing=[]; if(!name)missing.push('Navn'); if(!desc)missing.push('Beskrivelse'); if(!intens)missing.push('Intensitet'); if(!cat)missing.push('Kategori'); if(!focus)missing.push('Fokusområde'); if(!noise)missing.push('Lydnivå');
@@ -292,12 +283,8 @@ const Editor = {
     const fEqMenu = document.getElementById('fEqMenu');
     const fEqHint = document.getElementById('fEqHint');
 
-    // Viktig: fSelectedEquip deklareres KUN én gang her (IKKE på nytt senere)
     let fSelectedEquip = new Set();
-    function updateFilterEquipHint(){
-      const a=[...fSelectedEquip];
-      if (fEqHint) fEqHint.textContent = a.length ? a.join(', ') : 'kun kroppsvekt';
-    }
+    function updateFilterEquipHint(){ const a=[...fSelectedEquip]; if (fEqHint) fEqHint.textContent = a.length ? a.join(', ') : 'kun kroppsvekt'; }
 
     fEqBtn.onclick = () => { fEqMenu.style.display = (fEqMenu.style.display==='none' ? 'block' : 'none'); };
     const fEqAll = document.getElementById('fEqAll');
@@ -315,7 +302,7 @@ const Editor = {
     function matchesFilters(e){
       const fFocus  = document.getElementById('fFocus').value;
       const fCat    = document.getElementById('fCat').value;
-      const fInt    = document.getElementById('fIntensity').value;   // Lav/Middels/Høy
+      const fInt    = document.getElementById('fIntensity').value;
       const fNoise  = document.getElementById('fNoise').value;
       const fSearch = (document.getElementById('fSearch').value||'').trim().toLowerCase();
 
@@ -340,6 +327,7 @@ const Editor = {
       list.sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0));
       let html='';
       for (const e of list){
+        const dur=Number(e.default_duration_sec||60);
         html+=
           '<div class="card">' +
             '<div class="row">' +
@@ -348,9 +336,8 @@ const Editor = {
                 '<div class="small">'+(String(e.description||'').replace(/\n/g,'<br>'))+'</div>' +
               '</div>' +
               '<div class="actions">' +
-                '<button class="icon-btn" aria-label="Legg til i økt" data-add="'+e.exercise_id+'"><svg class="icon"><use href="#ph-plus"/></svg></button>' +
-                '<button class="icon-btn" aria-label="Rediger" data-edit="'+e.exercise_id+'"><svg class="icon"><use href="#ph-pencil-fill"/></svg></button>' +
-                '<button class="icon-btn trash" aria-label="Slett" data-del="'+e.exercise_id+'"><svg class="icon"><use href="#ph-trash-fill"/></svg></button>' +
+                '<button class="icon-btn" aria-label="Legg til i økt" data-add="'+e.exercise_id+'"><svg class="icon"><use href="#ph-plus"></use></svg></button>' +
+                '<button class="icon-btn" aria-label="Rediger" data-edit="'+e.exercise_id+'"><svg class="icon"><use href="#ph-pencil-fill"></use></svg></button>'-btn trash" aria-label="Slett" data-del="'+e.exercise_id+'"><svg class="icon">#ph-trash-fill</use></svg></button>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -366,7 +353,7 @@ const Editor = {
         renderItems();
       });
 
-      // Rediger
+      // Rediger → fyll venstre side
       document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
         const ex=AppState.exercises.find(x=>x.exercise_id===b.dataset.edit); if(!ex) return;
         document.getElementById('new_name').value     = ex.name || '';
@@ -416,8 +403,12 @@ const Editor = {
     function renderItems(){
       const container=document.getElementById('items'); if(!container) return;
       if (!w.items || !w.items.length) {
-        container.innerHTML = '<div class="card small">Ingen øvelser i økta ennå.</div>'; return;
+        container.innerHTML =
+          '<div class="card small">Ingen øvelser i økta ennå.<br/>' +
+          'Legg til med <svg class="inline-icon">#ph-plus</use></svg> i øvelseslista.</div>';
+        return;
       }
+
       let html='';
       w.items.forEach((it, idx) => {
         const ex = AppState.exercises.find(x=>x.exercise_id===it.exercise_id);
@@ -430,7 +421,7 @@ const Editor = {
               '<div class="title"><strong>'+name+'</strong></div>' +
               '<div class="actions"><span class="drag-handle" title="Dra for å flytte">↕</span></div>' +
             '</div>' +
-            '<div class="flex" style="margin-top:6px;">' +
+            '<div class="flex" style="margin-top:6px; align-items:flex-end;">' +
               '<div style="flex:1;">' +
                 '<div class="small" style="color:#666;margin-bottom:4px;">Varighet (mm:ss)</div>' +
                 '<input class="input" value="'+Util.fmtMMSS(d)+'" data-dur="'+idx+'" />' +
@@ -439,15 +430,27 @@ const Editor = {
                 '<div class="small" style="color:#666;margin-bottom:4px;">Pause (s)</div>' +
                 '<input class="input" value="'+p+'" data-pause="'+idx+'" />' +
               '</div>' +
-            '</div>' +
-            '<div class="flex" style="margin-top:8px;">' +
-              '<button class="icon-btn trash" aria-label="Fjern" data-del="'+idx+'">' +
-                '<svg class="icon"><use href="#ph-trash-fill"/></svg>' +
-              '</button>' +
+              '<div style="flex:0;">' +
+                '<button class="icon-btn trash" aria-label="Fjern" data-del="'+idx+'">' +
+                  '<svg class="icon">#ph-trash-fill</use></svg>' +
+                '</button>' +
+              '</div>' +
             '</div>' +
           '</div>';
       });
       container.innerHTML = html;
+
+      // Legg til "Kopier serie" under lista
+      const copyWrap = document.createElement('div');
+      copyWrap.className = 'flex';
+      copyWrap.style.marginTop = '8px';
+      copyWrap.innerHTML = '<button class="button secondary" id="duplicateSeries">Kopier serie</button>';
+      container.appendChild(copyWrap);
+      document.getElementById('duplicateSeries').onclick = () => {
+        const clone = (w.items || []).map(it => ({ exercise_id: it.exercise_id, duration_sec: it.duration_sec, pause_after_sec: it.pause_after_sec }));
+        w.items = (w.items || []).concat(clone);
+        renderItems();
+      };
 
       container.querySelectorAll('.item-card').forEach(el => addDragHandlers(el, Number(el.getAttribute('data-idx'))));
       container.querySelectorAll('[data-dur]').forEach(inp => inp.onchange = () => {
