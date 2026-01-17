@@ -227,8 +227,26 @@ LOGG:
 - Fjern teksten "minutter" på Y-aksen.
 
 REV11 (ikkje kjørt)
-SESSION: Melding om man prøver å navigere bort fra økta: "Økt kjører. Avslutt økta først."
--------------------------
+Index.html: Jeg har lagt inn følgende kode for å få inn favicon i appen: [kode]
+
+SESSION:
+- Gi feilmelding dersom man prøver å navigere seg bort fra modulen før den er ferdig: "Økt kjører. Avslutt økta først."
+- Jeg liker den grønne ramma når øvelsen er i gang. Jeg ønsker også at øvelsesfeltet har bakgrunnsfarge lik som rammen men med 80% gjennomsiktighet. Jeg ønsker den samme for pausene, bare med gul-oransj farge. Knappene for start, forrige, neste, lagre og slett skal ikke ha bakgrunnsfarge. Heller ikke feltene for nedtellingstidtakerene.
+- Jeg ønsker mye høyere lyd i faseoverganger, og gjerne en lyd som høres ut som en bjelle. Det er vikrigere at dette fungerer på en mobil enn på PCen.
+- Skriftstørrelser:
+-   Reduser skriftstørrelse på "Neste" og "Øvelse" til en tredjedel.
+-   Øk skriftstørrelsen på beskrivelsen av økta til det doble
+
+EDITOR 
+I "Bygg økt" feltet
+- Etter teksten "Ingen øvelser i økta ennå": Skriv "Legg til med [PLUSS-IKON] i øvelseslista". Der jeg har skrevet [PLUSS-IKON] skal du sette inn selve ikonet. Juster størrelsen på ikonet slik at det passer med teksten.
+- Flytt søppelspann-ikonet opp på høyde med boksene for tid og varighet. Det skal stå til høyre disse.
+- Legg til en knapp under siste øvelse som kopierer hele serien av øvelsene som  er lagt til, og legger dem til på nytt under, som en ny serie.
+ENDRINGER I LOGG
+- Loggen skal angi den faktiske tida som er brukt i øvelsen. Nå logges økte bare med den teoretiske varigheten uavhengig om man har skippa alle øvelsene, avbrutt økta, eller gjort øvelser på nytt. Statistikken gjenspeiler det samme.
+
+
+
 REVXX
 GENERELT:
 - Rette opp skrivefeil her og der
@@ -238,16 +256,28 @@ GENERELT:
 - Legge inn en del standardøvelser og økter i selve programmet
 - Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout? (be om å oppdatere style.css)
 - Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
-- Rollover med humoristisk tekst, trenings og eller triatlonrelatert.
+- Rollover med humoristisk tekst, trenings og eller triatlonrelatert. Evt motiverande sitat frå gamle trenarar og idrettshelter ruller over skjermen nederst på dashboard (feks). Kanskje begge men på ulike steder i appen. (Motiverende tekst på dashboard, og humor i logg.
+
+README
+Lage ny README med bruksanvinsning og/eller FAQ 
+- Always on display funker ikke enda
+- Lag fullskjerm selv
+- Legg til på hjem skjerm
+- orklaring eksportfunksjon
+- Forklaring på hvordan verdier du kan sortere på må være lagt inn i øvelser og økter.  
+- Forslag på kategorier av økter, og øvelser. Det er ikkje sikkert det ska være det samme. Kan ha fleire kategorier av øvelser i ei økt. Kanskje kontorstyrke,  svømmestyrke, løpsstyrke, plyo, yoga 🧘 (?!) kqn være kurante øktkategorier?
+- Muskelgrupper kan være kurante fokusområder
 
 EDITOR:
 Mulighet til å legge inn flere sett. Kopieringsfunksjon av øvelser og hele sett og mulighet for å legge inn seriepause.
-LEgge inn favicon (Gjøre selv?)
-SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
+I øktbyggeren kommer ikke alle alternativer for kategori opp (pga plassmangel) når kategori skal skrives inn. Dette åpner for muligheten til å bruke forskjellige begreper til det som egentlig skulle vært sortert under samme kategori. Dette gir utfordringer når man skal sortere på øvelser når økter skal settes sammen. Eksempel: MAn kan lagre spensthopp og burpees under både "Spenst" og "plyo", men man mener egentlig det samme. (Gjelder spesielt dersom det er flere brukere.
+SESSION:
+Rakett 🚀, fyrverkeri og/eller motivasjonstekst (Bra jobba!) når økta er ferdig? (Nå står det jo for så vidt "Ferdig!" som kan være motiverende nok i seg selv.
 
 Videre arbeid:
 - Tilkobling pulsbelte
 - Forhåndsdefinerte kategorier?
-- RPE på øvelsesvelgeren
 - Ha appen i skya slik at økter, øvelser og favoritter er felles mellom pc/tablet/tlf. (Kan vel ikke ha telefonlagring)
 - Ulempe: Må være på nett for å kjøre økt fra github/lsok.
+- SPØRSMÅL: HVOR lagres egentlig loggen og øktene jeg lagrer? Kan jeg lagre disse også i skyen?
+- Skjerm kan ikkje gå i svart 
