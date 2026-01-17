@@ -13,7 +13,8 @@ const AppState = {
   logs: Store.load(Store.keys.logs),
   currentRoute: 'dashboard',
   currentWorkout: null,
-  autostart: false
+  autostart: false,
+  sessionLock: false // <— sperrer navigering mens Session kjører
 };
 
 const Util = {
@@ -57,6 +58,12 @@ function render(html){ document.getElementById('app').innerHTML = html; }
 function setActive(route){ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.route===route)); }
 
 function navigate(route){
+  // Blokker navigasjon hvis Session kjører
+  if (AppState.sessionLock) {
+    alert('Økt kjører. Avslutt økta først.');
+    return;
+  }
+
   window.onkeydown = null;
   AppState.currentRoute = route;
   setActive(route);
@@ -74,11 +81,11 @@ function navigate(route){
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.route)));
 
-  // Logo → Dashboard (uten reload)
+  // Logo → Dashboard (uten reload) hvis id=brandLink finnes
   const brand = document.getElementById('brandLink');
   if (brand) brand.addEventListener('click', (e)=>{ e.preventDefault(); navigate('dashboard'); });
 
-  // Hamburger wiring
+  // Hamburger-meny
   const hBtn  = document.getElementById('hamburgerBtn');
   const hMenu = document.getElementById('hamburgerMenu');
   if (hBtn && hMenu) {
