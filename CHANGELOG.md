@@ -266,7 +266,11 @@ I "Bygg økt" feltet
 ENDRINGER I LOGG
 - Loggen skal angi den faktiske tida som er brukt i øvelsen. Nå logges økte bare med den teoretiske varigheten uavhengig om man har skippa alle øvelsene, avbrutt økta, eller gjort øvelser på nytt. Statistikken gjenspeiler det samme.
 
-
+REV12 (Ikkje kjørt)
+LOGG:
+  Mulighet for eksport og import, slik som økter og øvelser.
+SESSION
+  Justere skriftstørrelser?
 
 REVXX
 GENERELT:
