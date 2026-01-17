@@ -2,7 +2,9 @@
 :root {
   --bg:#f9fafb; --fg:#222; --muted:#666;
   --accent:#4c7a9f; --accent2:#c9a66b; --border:#e5e7eb;
-  --green:#1aaa55; --red:#d32f2f;
+  --green:#1aaa55;          /* øvelse (work) */
+  --amber:#f0ad0f;          /* pause (gul-oransj) */
+  --red:#d32f2f;
 }
 
 * { box-sizing: border-box; }
@@ -18,10 +20,8 @@ body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); ma
 
 /* 2 kolonner -> stack under 860px */
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.grid-2 > div { min-width:0; } /* hindrer overflow */
-@media (max-width: 860px) {
-  .grid-2 { grid-template-columns: 1fr; }
-}
+.grid-2 > div { min-width:0; }
+@media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
 
 /* Topbar */
 .topbar {
@@ -37,7 +37,7 @@ body { font-family: Arial, sans-serif; background:var(--bg); color:var(--fg); ma
 
 /* Hamburger (til høyre) */
 .hamburger {
-  display:none; margin-left:auto; /* <— viktig for høyreplassering når .nav er skjult */
+  display:none; margin-left:auto;
   width:44px; height:44px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer;
 }
 .hamburger .icon { width:22px; height:22px; }
@@ -78,13 +78,34 @@ textarea { resize: vertical; min-height: 80px; }
 .icon { width:20px; height:20px; }
 
 /* Special icon colors */
-.icon-btn.play .icon { color: var(--green); }
-.icon-btn.trash .icon { color: var(--red); }  /* alle søppelspann røde */
+.icon-btn.play .icon  { color: var(--green); }
+.icon-btn.trash .icon { color: var(--red); }
 
-/* Session card state borders */
-.session-card { transition: border-color 0.2s, border-width 0.2s; }
-.session-card.work  { border-color: var(--green); border-width: 3px; }
-.session-card.pause { border-color: var(--border); border-width: 1px; }
+/* --- SESSION: ramme + bakgrunn (80% gjennomsiktighet) --- */
+.session-card {
+  transition: border-color 0.2s, border-width 0.2s, background-color 0.2s;
+}
+.session-card.work  {
+  border-color: var(--green);
+  border-width: 3px;
+  background: rgba(26,170,85,0.2);    /* 80% transparent */
+}
+.session-card.pause {
+  border-color: var(--amber);
+  border-width: 3px;
+  background: rgba(240,173,15,0.2);   /* 80% transparent */
+}
+
+/* Session-kontroller og “timer-kort” skal ikke ha bakgrunn/border */
+.session-card .icon-btn { background: transparent; border: none; }
+.session-card .card     { background: transparent; border: none; }
+
+/* Tekststørrelser i Session */
+.session-title { font-size: 20px; font-weight: 700; line-height: 1.2; }  /* 1/3 av tidligere 60px */
+.session-desc  { font-size: 2em; line-height: 1.4; }                      /* 2× beskrivelse */
+
+/* Inline små ikoner (for tekstlinjer, f.eks. pluss-hint) */
+.inline-icon { width: 1em; height: 1em; vertical-align: -0.15em; }
 
 /* Editor – drag handle tydelig på høyre side */
 .item-card { position: relative; }
@@ -95,10 +116,4 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* Editor – 2 kolonner for egenskaper */
 .form-grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-@media (max-width: 640px) {
-  .form-grid-2 { grid-template-columns: 1fr; }
-}
-
-/* Session store overskrift (3×) */
-.session-title { font-size: 60px; font-weight: 700; line-height: 1.15; }
-``
+@media (max-width: 640px) { .form-grid-2 { grid-template-columns: 1fr; } }
