@@ -268,15 +268,104 @@ ENDRINGER I LOGG
 
 REV12 (Ikkje kjørt)
 LOGG:
-  Mulighet for eksport og import, slik som økter og øvelser.
+- Fjern overskriftene "Statistikk", "Progresjon (7 dager)" og "Logg (per dag)"
+- Legg inn Mulighet for eksport og import, slik som økter og øvelser, i feltet for dagslogger. Legg den øverst. Filnavn for eksport: [dato]_logg. [dato] skal være i formatet ååmmdd.
+- Jeg vil at der alle dagens økter er logget skal også varighet av disse stå. Det skal stå på samme linje som dagen det gjelder, lengst til høyre i feltet.
+- TCX-fila skal kodes slik:
+-   <?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase
+  xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd"
+  xmlns:ns5="http://www.garmin.com/xmlschemas/ActivityGoals/v1"
+  xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2"
+  xmlns:ns2="http://www.garmin.com/xmlschemas/UserProfile/v2"
+  xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.garmin.com/xmlschemas/ProfileExtension/v1">
+  <Activities>
+    <Activity Sport="Other">
+      <Id>2026-01-20T13:00:14.000Z</Id>
+      <Lap StartTime="2026-01-20T13:00:14.000Z">
+        <TotalTimeSeconds>606.694</TotalTimeSeconds>
+        <DistanceMeters>0.0</DistanceMeters>
+        <Calories>39</Calories>
+        <AverageHeartRateBpm>
+          <Value>75</Value>
+        </AverageHeartRateBpm>
+        <MaximumHeartRateBpm>
+          <Value>107</Value>
+        </MaximumHeartRateBpm>
+        <Intensity>Active</Intensity>
+        <TriggerMethod>Manual</TriggerMethod>
+        <Track>
+          <Trackpoint>
+            <Time>2026-01-20T13:00:14.000Z</Time>
+            <DistanceMeters>0.0</DistanceMeters>
+            <HeartRateBpm>
+              <Value>61</Value>
+            </HeartRateBpm>
+            <Extensions>
+              <ns3:TPX/>
+            </Extensions>
+          </Trackpoint>
+ 
+ [...]
+          <Trackpoint>
+            <Time>2026-01-20T13:28:03.000Z</Time>
+            <DistanceMeters>0.0</DistanceMeters>
+            <HeartRateBpm>
+              <Value>69</Value>
+            </HeartRateBpm>
+            <Extensions>
+              <ns3:TPX/>
+            </Extensions>
+          </Trackpoint>
+        </Track>
+        <Extensions>
+          <ns3:LX/>
+        </Extensions>
+      </Lap>
+      <Creator xsi:type="Device_t">
+        <Name>Styrketreningsapp</Name>
+        <UnitId>3477229470</UnitId>
+        <ProductID>4376</ProductID>
+        <Version>
+          <VersionMajor>23</VersionMajor>
+          <VersionMinor>48</VersionMinor>
+          <BuildMajor>0</BuildMajor>
+          <BuildMinor>0</BuildMinor>
+        </Version>
+      </Creator>
+    </Activity>
+  </Activities>
+  <Author xsi:type="Application_t">
+    <Name>Connect Api</Name>
+    <Build>
+      <Version>
+        <VersionMajor>25</VersionMajor>
+        <VersionMinor>24</VersionMinor>
+        <BuildMajor>0</BuildMajor>
+        <BuildMinor>0</BuildMinor>
+      </Version>
+    </Build>
+    <LangID>en</LangID>
+    <PartNumber>006-D2449-00</PartNumber>
+  </Author>
+</TrainingCenterDatabase>
+
+- Mulighet for å slette øvelser som er logget (Søppelspann) 
 SESSION
-  Justere skriftstørrelser?
+- Justere skriftstørrelser?
+- Legge inn en markør midt på progressbar for øvelsen, for å vite når man er halvvegs i øvelsen (relevant dersom mena skal bytte fot halvvegs).
+EDITOR
+- Omdøpe "Øvelser" til "Øvelsesfilter"? Omdøpe "Øvelsesbibliotek" til Importer/Eksporter Øvelsesbibliotek.
+- Mulighet for å minimere Lag/rediger øvelse.
 
 REVXX
+NY MODUL!
+Intervalltidtakar. Predefinerte intervaller (6x6, 30x45/15 etc). Også mulighet for å sette noko opp on the fly på få sekunder. Lagre nye timere, etc.
+
 GENERELT:
 - Rette opp skrivefeil her og der
-- Korleis få logoen opp dersom ein legg ein snarveg til hjemskjermen på iPhone.
-- Teit navn. Trenger nytt og bedre navn. Legg til logo.
+- Teit navn. Trenger nytt og bedre navn.
 - Begrepsopprydning. Store bokstaver der det mangler. Puss.
 - Legge inn en del standardøvelser og økter i selve programmet
 - Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout? (be om å oppdatere style.css)
