@@ -5,7 +5,7 @@ const Log = {
   render() {
     const stats = this._computeStats();
 
-    // Øverste statistikk (ingen H2-tittel)
+    // Statistikk (uten tittel)
     const statHtml =
       '<div class="card">' +
         '<div>Varighet siste 7 dager: <strong>'+Util.fmtMMSS(stats.sum7)+'</strong></div>' +
@@ -14,40 +14,42 @@ const Log = {
         '<div>Streak (dager på rad): <strong>'+stats.streak+'</strong></div>' +
       '</div>';
 
-    // Graf (ingen H2-tittel)
+    // Graf (uten tittel)
     const chartHtml =
       '<div class="card">' +
         '<canvas id="logChart" width="800" height="260" style="max-width:100%;"></canvas>' +
       '</div>';
 
-    // Dagsloggseksjon: Import-kontroll helt øverst, så dager
+    // Dagslogger med Import + Export-all på toppen
     const daysHtml = this._renderDays();
 
     render(statHtml + chartHtml + daysHtml);
 
     this._drawChart('logChart', stats.labels, stats.values, stats.yMax);
 
-    // Wire import-knapp
+    // Wire topp-knapper
     const impBtn = document.getElementById('logImport');
-    if (impBtn) impBtn.onclick = () => this._importCSV();
+    if (impBtn) impBtn.onclick = () => this._importCSVAll();
+    const expAllBtn = document.getElementById('logExportAll');
+    if (expAllBtn) expAllBtn.onclick = () => this._exportCSVAll();
 
-    // Wire per-dag knapper (TCX/CSV/slett økter)
+    // Wire per-dag knapper (TCX og ev. CSV per dag)
     document.querySelectorAll('[data-export-tcx]').forEach(b=>b.onclick=()=>this.exportTCX(b.dataset.exportTcx));
-    document.querySelectorAll('[data-export-csv]').forEach(b=>b.onclick=()=>this.exportDayCSV(b.dataset.exportCsv));
     document.querySelectorAll('[data-del-session]').forEach(b=>b.onclick=()=>this._deleteSession(b.dataset.day, Number(b.dataset.idx)));
   },
 
   _renderDays(){
     const days = (AppState.logs||[]).slice().reverse();
 
-    // Import/Export-kontroller (øverst i feltet for dagslogger)
+    // Import + Export-all på topp
     let html =
       '<div class="card">' +
         '<div class="flex" style="align-items:center; justify-content:space-between;">' +
-          '<div class="small" style="color:#666;">Dagslogger</div>' +
+          '<div><strong>Dagslogger</strong></div>' +
           '<div class="flex" style="gap:8px;">' +
             '<input type="file" id="logcsv" accept=".csv" />' +
             '<button class="button" id="logImport">Importer logg (CSV)</button>' +
+            '<button class="button secondary" id="logExportAll">Eksporter logg (CSV)</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -57,14 +59,14 @@ const Log = {
       return html;
     }
 
-    // Per dag: tittel med total-tid helt til høyre, økter under + knapper
+    // Per dag: dato (venstre) + total tid (høyre, samme størrelse som dato)
     for (const d of days) {
       const totalForDay = (d.sessions||[]).reduce((a,b)=>a+(b.duration_sec||0),0);
       html +=
         '<div class="card">' +
           '<div class="flex" style="justify-content:space-between; align-items:center;">' +
             '<div><strong>'+d.date+'</strong></div>' +
-            '<div class="small" style="color:#444;"><strong>'+Util.fmtMMSS(totalForDay)+'</strong></div>' +
+            '<div><strong>'+Util.fmtMMSS(totalForDay)+'</strong></div>' +
           '</div>' +
           ((d.sessions||[]).map((s, idx) => {
             const t = new Date(s.start_time_local);
@@ -75,7 +77,7 @@ const Log = {
                 '<div class="small">'+hh+':'+mm+' — '+s.name+' • '+Util.fmtMMSS(s.duration_sec)+'</div>' +
                 '<div class="actions">' +
                   '<button class="icon-btn trash" title="Slett økt" aria-label="Slett økt" data-del-session data-day="'+d.date+'" data-idx="'+idx+'">' +
-                    '<svg class="icon">#ph-trash-fill</use></svg>' +
+                    '<svg class="icon"><use href="#ph-trash-fill"/></svg>' +
                   '</button>' +
                 '</div>' +
               '</div>'
@@ -83,7 +85,6 @@ const Log = {
           }).join('')) +
           '<div class="flex" style="gap:8px; margin-top:8px;">' +
             '<button class="button" data-export-tcx="'+d.date+'">Eksporter TCX</button>' +
-            '<button class="button secondary" data-export-csv="'+d.date+'">Eksporter CSV</button>' +
           '</div>' +
         '</div>';
     }
@@ -143,16 +144,28 @@ const Log = {
     });
   },
 
-  // ===== Import/Export CSV for dagslogger =====
+  // ===== Import/Export CSV (ALLE DAGER) =====
 
-  _importCSV(){
+  _exportCSVAll(){
+    const headers = ['date','start_time_local','name','duration_sec','workout_id','computed_hr_bpm'];
+    const rows = [];
+    (AppState.logs||[]).forEach(d=>{
+      (d.sessions||[]).forEach(s=>{
+        rows.push([ d.date, s.start_time_local, s.name, s.duration_sec, s.workout_id||'', s.computed_hr_bpm||'' ]);
+      });
+    });
+    const csv = Util.toCSV(headers, rows, ';');
+    Util.download('logg_alle.csv', csv, 'text/csv;charset=utf-8');
+  },
+
+  _importCSVAll(){
     const file = document.getElementById('logcsv').files[0];
     if (!file) return alert('Velg en logg-CSV først.');
     const r = new FileReader();
     r.onload = () => {
-      const rows = Util.parseCSV(r.result, ';'); // forventer ; som separator
-      // Forventer kolonner: date,start_time_local,name,duration_sec,workout_id (date kan mangle -> trekkes fra start_time_local)
-      const byDate = new Map((AppState.logs||[]).map(d=>[d.date, d]));
+      const rows = Util.parseCSV(r.result, ';');
+      // Bygg nøyaktig samme struktur (AppState.logs = [{ date, sessions: [...] }, ...], sortert stigende på dato)
+      const byDate = new Map();
       rows.forEach(row => {
         const date = (row.date && row.date.length>=10) ? row.date.substring(0,10)
                     : (row.start_time_local ? String(row.start_time_local).substring(0,10) : null);
@@ -165,35 +178,18 @@ const Log = {
           computed_hr_bpm: Number(row.computed_hr_bpm || 90) || 90,
           events: []
         };
-        let day = byDate.get(date);
-        if (!day){ day = { date, sessions: [] }; byDate.set(date, day); }
-        day.sessions.push(sess);
+        if (!byDate.has(date)) byDate.set(date, { date, sessions: [] });
+        byDate.get(date).sessions.push(sess);
       });
-      AppState.logs = Array.from(byDate.values());
+      // Sorter sessions per dag etter start_time, og dager etter dato (stigende)
+      const list = Array.from(byDate.values()).sort((a,b)=>a.date.localeCompare(b.date));
+      list.forEach(d => d.sessions.sort((a,b)=>new Date(a.start_time_local)-new Date(b.start_time_local)));
+      AppState.logs = list;
       Store.save(Store.keys.logs, AppState.logs);
       alert('Logg importert.');
       Log.render();
     };
     r.readAsText(file);
-  },
-
-  exportDayCSV(dateStr) {
-    const day = (AppState.logs||[]).find(d=>d.date===dateStr);
-    if (!day) return alert('Ingen data for valgt dag.');
-    const headers = ['date','start_time_local','name','duration_sec','workout_id','computed_hr_bpm'];
-    const rows = (day.sessions||[]).map(s => [
-      dateStr, s.start_time_local, s.name, s.duration_sec, s.workout_id||'', s.computed_hr_bpm||''
-    ]);
-    const csv = Util.toCSV(headers, rows, ';');
-    const yymmdd = this._fmtYYMMDD(dateStr);
-    Util.download(`${yymmdd}_logg.csv`, csv, 'text/csv;charset=utf-8');
-  },
-
-  _fmtYYMMDD(dateStr){ // "YYYY-MM-DD" -> "YYMMDD"
-    const y = dateStr.substring(2,4);
-    const m = dateStr.substring(5,7);
-    const d = dateStr.substring(8,10);
-    return `${y}${m}${d}`;
   },
 
   _deleteSession(dateStr, idx){
@@ -206,7 +202,7 @@ const Log = {
     Log.render();
   },
 
-  // ===== TCX-eksport: i henhold til ønsket eksempel =====
+  // ===== TCX-eksport: per dag, i ønsket schema =====
   exportTCX(dateStr){
     const day = (AppState.logs||[]).find(d=>d.date===dateStr); if (!day) return alert('Ingen data for valgt dag.');
 
@@ -221,11 +217,6 @@ const Log = {
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.garmin.com/xmlschemas/ProfileExtension/v1">
   <Activities>`;
 
-    // Én Activity med én Lap pr. dag (summerer alle sessions i Track, tidslinje sekvensielt)
-    // Alternativt: flere Lap-er – men eksempelet viser én Lap. Vi legger hele dagen i én Lap med starttid = første økt sin start, hvis finnes.
-    // Hvis flere økter: vi concatenater Trackpoints back-to-back.
-
-    // Finn earliest start_time for Id/StartTime
     const all = (day.sessions||[]).slice().sort((a,b)=>new Date(a.start_time_local)-new Date(b.start_time_local));
     const startIso = (all[0]?.start_time_local) || (new Date(day.date+'T00:00:00Z')).toISOString();
     const totalDur = (day.sessions||[]).reduce((a,b)=>a+(b.duration_sec||0),0);
@@ -251,7 +242,6 @@ const Log = {
         <Track>
 `;
 
-    // Trackpoints per sekund, med HR rundt sessions' computed_hr_bpm (enkelt), og ns3:TPX extension
     let curTs = new Date(startIso).getTime();
     for (const s of (day.sessions||[])) {
       const hr = s.computed_hr_bpm || 90;
@@ -309,6 +299,13 @@ const Log = {
 
     const yymmdd = this._fmtYYMMDD(day.date);
     Util.download(`${yymmdd}_logg.tcx`, xml, 'application/xml');
+  },
+
+  _fmtYYMMDD(dateStr){ // "YYYY-MM-DD" -> "YYMMDD"
+    const y = dateStr.substring(2,4);
+    const m = dateStr.substring(5,7);
+    const d = dateStr.substring(8,10);
+    return `${y}${m}${d}`;
   }
 };
 
