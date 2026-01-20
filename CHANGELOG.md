@@ -271,7 +271,7 @@ LOGG:
 - Fjern overskriftene "Statistikk", "Progresjon (7 dager)" og "Logg (per dag)"
 - Legg inn Mulighet for eksport og import, slik som økter og øvelser, i feltet for dagslogger. Legg den øverst. Filnavn for eksport: [dato]_logg. [dato] skal være i formatet ååmmdd.
 - Jeg vil at der alle dagens økter er logget skal også varighet av disse stå. Det skal stå på samme linje som dagen det gjelder, lengst til høyre i feltet.
-- TCX-fila skal kodes slik:
+- TCX-fila skal kodes som dette eksempelet:
 -   <?xml version="1.0" encoding="UTF-8"?>
 <TrainingCenterDatabase
   xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd"
@@ -355,9 +355,7 @@ LOGG:
 SESSION
 - Justere skriftstørrelser?
 - Legge inn en markør midt på progressbar for øvelsen, for å vite når man er halvvegs i øvelsen (relevant dersom mena skal bytte fot halvvegs).
-EDITOR
-- Omdøpe "Øvelser" til "Øvelsesfilter"? Omdøpe "Øvelsesbibliotek" til Importer/Eksporter Øvelsesbibliotek.
-- Mulighet for å minimere Lag/rediger øvelse.
+
 
 REVXX
 NY MODUL!
@@ -371,13 +369,15 @@ GENERELT:
 - Mer spenstig design? Logo, fonter farger linjer og bokser. Annen layout? (be om å oppdatere style.css)
 - Føy til tips om fullskjerm (Skjul verktøylinje for fullskjermmodus i landskap på telefon/pad for å maksimere skjermareal).
 - Rollover med humoristisk tekst, trenings og eller triatlonrelatert. Evt motiverande sitat frå gamle trenarar og idrettshelter ruller over skjermen nederst på dashboard (feks). Kanskje begge men på ulike steder i appen. (Motiverende tekst på dashboard, og humor i logg.
-
+EDITOR
+- Omdøpe "Øvelser" til "Øvelsesfilter"? Omdøpe "Øvelsesbibliotek" til Importer/Eksporter Øvelsesbibliotek.
+- Mulighet for å minimere Lag/rediger øvelse.
 README
 Lage ny README med bruksanvinsning og/eller FAQ 
 - Always on display funker ikke enda
 - Lag fullskjerm selv
 - Legg til på hjem skjerm
-- orklaring eksportfunksjon
+- Forklaring eksportfunksjon
 - Forklaring på hvordan verdier du kan sortere på må være lagt inn i øvelser og økter.  
 - Forslag på kategorier av økter, og øvelser. Det er ikkje sikkert det ska være det samme. Kan ha fleire kategorier av øvelser i ei økt. Kanskje kontorstyrke,  svømmestyrke, løpsstyrke, plyo, yoga 🧘 (?!) kqn være kurante øktkategorier?
 - Muskelgrupper kan være kurante fokusområder
@@ -388,8 +388,11 @@ I øktbyggeren kommer ikke alle alternativer for kategori opp (pga plassmangel) 
 SESSION:
 Rakett 🚀, fyrverkeri og/eller motivasjonstekst (Bra jobba!) når økta er ferdig? (Nå står det jo for så vidt "Ferdig!" som kan være motiverende nok i seg selv.
 
+Be Copilot lage et master-prompt
+
 Videre arbeid:
 - Tilkobling pulsbelte
+- Skylagring av økter/Øvelser/Logg?
 - Forhåndsdefinerte kategorier?
 - Ha appen i skya slik at økter, øvelser og favoritter er felles mellom pc/tablet/tlf. (Kan vel ikke ha telefonlagring)
 - Ulempe: Må være på nett for å kjøre økt fra github/lsok.
