@@ -2,11 +2,12 @@
 // modules/session.js
 //
 // - Navigasjon sperres (AppState.sessionLock) til Save/Discard
-// - Bakgrunn + ramme: grønn (work) / amber (pause), 80% gjennomsiktighet
-// - Kontroller/timer-felter er transparente (se style.css regler)
+// - Bakgrunn + ramme: grønn (work) / amber (pause), 80% gjennomsiktighet (se style.css)
+// - Kontroller/timer-felter er transparente (se style.css)
 // - Høy bjelle (to oscillatorer) + mobil-unlock
 // - Status: mindre (1/3), beskrivelse 2×
 // - Logger faktisk tid (elapsedSec)
+// - Halvveis-markør i progress for gjeldende fase
 
 const Session = {
   timer: null,
@@ -41,8 +42,8 @@ const Session = {
       const now = ctx.currentTime;
       g.gain.cancelScheduledValues(now);
       g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.7, now + 0.02);   // høyere volum
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.8); // lengre hale
+      g.gain.exponentialRampToValueAtTime(0.7, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
 
       osc1.start(now);
       osc2.start(now + 0.005);
@@ -116,7 +117,10 @@ const Session = {
 
           '<div class="card">' +
             '<div class="small">Gjeldende fase</div>' +
-            '<div class="progress"><div id="barPhase" class="bar"></div></div>' +
+            '<div class="progress">' +
+              '<div class="half-marker"></div>' +
+              '<div id="barPhase" class="bar"></div>' +
+            '</div>' +
             '<div id="timePhase" class="session-timer">00:00</div>' +
           '</div>' +
 
@@ -127,11 +131,11 @@ const Session = {
           '</div>' +
 
           '<div class="flex">' +
-            '<button class="icon-btn play" id="start" aria-label="Start/Pause"><svg class="icon"><use href="#ph-play-fill"></use></svg></button>' +
-            '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon"><use href="#ph-caret-double-left-fill"></use></svg></button>' +
-            '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon"><use href="#ph-caret-double-right-fill"></use></svg></button>' +
-            '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon"><use href="#ph-floppy-disk-fill"></use></svg></button>' +
-            '<button class="icon-btn trash" id="discard" aria-label="Forkast"><svg class="icon"><use href="#ph-trash-fill"></use></svg></button>' +
+            '<button class="icon-btn play" id="start" aria-label="Start/Pause"><svg class="icon">#ph-play-fill</use></svg></button>' +
+            '<button class="icon-btn" id="prev" aria-label="Forrige"><svg class="icon">#ph-caret-double-left-fill</use></svg></button>' +
+            '<button class="icon-btn" id="next" aria-label="Neste"><svg class="icon">#ph-caret-double-right-fill</use></svg></button>' +
+            '<button class="icon-btn" id="save" aria-label="Lagre"><svg class="icon">#ph-floppy-disk-fill</use></svg></button>' +
+            '<button class="icon-btn trash" id="discard" aria-label="Forkast"><svg class="icon">#ph-trash-fill</use></svg></button>' +
           '</div>' +
         '</div>' +
 
@@ -157,8 +161,9 @@ const Session = {
       useEl.setAttribute('href', this.state.running ? '#ph-pause-fill' : '#ph-play-fill');
     };
 
+    const getPauseAfterLocal = (idx)=>getPauseAfter(idx);
     const currentPhaseTarget = () => {
-      if (this.state.phase === 'pause') return (this.state.idx<0 ? getPauseAfter(-1) : getPauseAfter(this.state.idx));
+      if (this.state.phase === 'pause') return (this.state.idx<0 ? getPauseAfterLocal(-1) : getPauseAfterLocal(this.state.idx));
       if (this.state.phase === 'work')  return (w.items[this.state.idx]||{}).duration_sec || 60;
       return 1;
     };
@@ -212,7 +217,7 @@ const Session = {
         }
         this.state.idx = nextIdx; this.state.phase = 'work'; this.state.remainingInPhase = w.items[this.state.idx].duration_sec;
       } else if (this.state.phase === 'work') {
-        if (this.state.idx < w.items.length-1) { this.state.phase = 'pause'; this.state.remainingInPhase = getPauseAfter(this.state.idx); }
+        if (this.state.idx < w.items.length-1) { this.state.phase = 'pause'; this.state.remainingInPhase = getPauseAfterLocal(this.state.idx); }
         else { this.state.phase = 'done'; this.state.remainingInPhase = 0; this.state.remainingTotal = 0; this.stop(); }
       }
       updateUI();
@@ -243,7 +248,7 @@ const Session = {
         this.state.idx -= 1; this.state.phase = 'work'; this.state.remainingInPhase = w.items[this.state.idx].duration_sec;
       } else {
         this.state.idx = Math.max(-1, this.state.idx - 1);
-        this.state.phase = 'pause'; this.state.remainingInPhase = (this.state.idx<0 ? getPauseAfter(-1) : getPauseAfter(this.state.idx));
+        this.state.phase = 'pause'; this.state.remainingInPhase = (this.state.idx<0 ? getPauseAfterLocal(-1) : getPauseAfterLocal(this.state.idx));
       }
       recomputeTotal(); updateUI();
     };
@@ -251,7 +256,7 @@ const Session = {
     const skipNext = () => {
       if (this.state.phase === 'done') return;
       if (this.state.phase === 'work') {
-        if (this.state.idx < w.items.length-1) { this.state.phase = 'pause'; this.state.remainingInPhase = getPauseAfter(this.state.idx); }
+        if (this.state.idx < w.items.length-1) { this.state.phase = 'pause'; this.state.remainingInPhase = getPauseAfterLocal(this.state.idx); }
         else { this.state.phase = 'done'; this.state.remainingInPhase = 0; this.state.remainingTotal = 0; this.stop(); }
       } else if (this.state.phase === 'pause') {
         const nextIdx = (this.state.idx < 0 ? 0 : this.state.idx+1);
@@ -278,7 +283,7 @@ const Session = {
         workout_id: w.workout_id,
         name: w.name,
         start_time_local: today.toISOString(),
-        duration_sec: this.elapsedSec, // faktisk tid
+        duration_sec: this.elapsedSec,
         computed_hr_bpm: 90,
         events: []
       });
@@ -317,3 +322,4 @@ const Session = {
 };
 
 window.Session = Session;
+``
