@@ -266,7 +266,7 @@ I "Bygg økt" feltet
 ENDRINGER I LOGG
 - Loggen skal angi den faktiske tida som er brukt i øvelsen. Nå logges økte bare med den teoretiske varigheten uavhengig om man har skippa alle øvelsene, avbrutt økta, eller gjort øvelser på nytt. Statistikken gjenspeiler det samme.
 
-REV12 (Ikkje kjørt)
+REV12
 LOGG:
 - Fjern overskriftene "Statistikk", "Progresjon (7 dager)" og "Logg (per dag)"
 - Legg inn Mulighet for eksport og import, slik som økter og øvelser, i feltet for dagslogger. Legg den øverst. Filnavn for eksport: [dato]_logg. [dato] skal være i formatet ååmmdd.
@@ -355,6 +355,8 @@ LOGG:
 SESSION
 - Justere skriftstørrelser?
 - Legge inn en markør midt på progressbar for øvelsen, for å vite når man er halvvegs i øvelsen (relevant dersom mena skal bytte fot halvvegs).
+
+ETTERJUSTERING AV REV12 DA DEN IKKE GIKK 100%:
 
 
 REVXX
