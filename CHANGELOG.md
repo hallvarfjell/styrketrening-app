@@ -357,7 +357,16 @@ SESSION
 - Legge inn en markør midt på progressbar for øvelsen, for å vite når man er halvvegs i øvelsen (relevant dersom mena skal bytte fot halvvegs).
 
 ETTERJUSTERING AV REV12 DA DEN IKKE GIKK 100%:
+"Viser til forrige revisjon. Jeg ønsker at eksportfunksjonen for loggen skal virke for alle økter samlet (ikke per dag), og på en slik måte at når man importerer loggen igjen ser den lik ut som før loggen ble eksportert. Eksportknappen skal være ved siden av importknappen. Eksporter TCX skal være per dag, som før.
 
+Ingen ikoner vises i sessions eller logg. Legg inn disse på nytt.
+
+I dagsloggene: La tekststørrelsen på tid brukt per dag være like stor som datoen."
+
+NÅ HAR CHATTEN I COPILOT BLITT SÅ LANG AT NETTLESERENE SLITER MED Å ÅPNE DEN. JEG LAGER EN HANDOVER FØR NESTE REVISJON. HANDOVERPROMPTET ER SLIK:
+Jeg vil ha en komplett dokumentasjon av appen slik den er nå inndelt i logiske kapitler (ett tekstdokument), men gjerne med bilder. Målet er at en KI (feks en ny chat i copilot) skal kunne replikere hele appen slik den fremstår nå kun ved hjelp av denne dokumentasjonen. Dokumentasjonen skal inkludere hvordan filstrukturen er delt opp, innhold i de ulike filene og hvordan filene virker sammen med hverandre (ulike moduler). Videre må du ta med en detaljert beskrivelse av hvert eneste element i brukergrensesnittet (hvert eneste felt, tekstboks, knapp, ikon, etc) med tanke på utseende, størrelse, funksjon, rekkefølge, eventuelt predefinerte verdier eller sorteringsfunksjoner, og alle andre egenskaper som knytter seg til disse. Legg også til diskusjoner vi har hatt samt hvilke feil som er gjort i revisjonene.
+
+I tillegg skal du lage en fil med bruksanvisning (Bruk gjerne README), hvordan alt i appen virker inkl øvelsesimport etc. Inkluder også begrensninger i appen og forslag til FAQ.
 
 REVXX
 NY MODUL!
