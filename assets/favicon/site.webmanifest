@@ -1,22 +1,21 @@
-
 {
-  "name": "Intervalltidtager",
-  "short_name": "Intervall",
+  "name": "Styrketrening-app",
+  "short_name": "Styrke",
   "icons": [
     {
-      "src": "android-chrome-192x192.png",
+      "src": "/https://hallvarfjell.github.io/styrketrening-app/assets/web-app-manifest-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
-      "src": "android-chrome-512x512.png",
+      "src": "/https://hallvarfjell.github.io/styrketrening-app/assets/web-app-manifest-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "theme_color": "#f6f8fc",
-  "background_color": "#f6f8fc",
-  "display": "standalone",
-  "start_url": "../../index.html",
-  "scope": "../../"
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
 }
