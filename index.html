@@ -1,97 +1,216 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="no">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Styrketreningsapp</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Intervalltidtager med oppvarming, blokker og nedkjøling." />
 
-  <!-- Favicon linker -->
-<link rel="icon" type="image/png" href="assets/favicon/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg" />
-<link rel="shortcut icon" href="assets/favicon/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Styrke" />
-<link rel="manifest" href="assets/favicon/site.webmanifest" />
+  <title>Intervalltidtager</title>
 
+  <!-- Favicons (fra /assets/favicon/) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+  <link rel="icon" href="assets/favicon/favicon.ico">
+  <link rel="manifest" href="assets/favicon/site.webmanifest">
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#f6f8fc">
+
+  <!-- Phosphor Icons (webfont) -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <!-- Logo fungerer som hjem-knapp -->
+      <button id="btnHome" class="home-btn" type="button" title="Hjem (pause + reset)" aria-label="Hjem">
+        <img src="assets/logo.png" alt="Logo" class="brand-logo" />
+      </button>
 
-  <!-- PHOSPHOR ICONS (INLINE SPRITE) -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;visibility:hidden" aria-hidden="true">
-    <symbol id="ph-play-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M240,128a8.2,8.2,0,0,1-3.1,6.3l-144,104A8.3,8.3,0,0,1,80,240a8,8,0,0,1-8-8V24a8,8,0,0,1,12.9-6.3l144,104A8.2,8.2,0,0,1,240,128Z"/>
-    </symbol>
-    <symbol id="ph-pause-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M104,40H72A16,16,0,0,0,56,56V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm80,0H152a16,16,0,0,0-16,16V200a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V56A16,16,0,0,0,184,40Z"/>
-    </symbol>
-    <symbol id="ph-caret-double-right-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M133.7,128,75.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Zm96,0L171.9,85.1a8,8,0,1,1,9.6-12.7l64,48a8,8,0,0,1,0,12.7l-64,48a8,8,0,1,1-9.6-12.7Z"/>
-    </symbol>
-    <symbol id="ph-caret-double-left-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M122.3,128l57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Zm-96,0,57.8,42.9a8,8,0,1,1-9.6,12.7l-64-48a8,8,0,0,1,0-12.7l64-48a8,8,0,1,1,9.6,12.7Z"/>
-    </symbol>
-    <symbol id="ph-floppy-disk-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M219.3,80.6l-44-44A15.9,15.9,0,0,0,164.7,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V91.3A15.9,15.9,0,0,0,219.3,80.6ZM160,200H96V144h64Zm16-88H80V48h80Z"/>
-    </symbol>
-    <symbol id="ph-trash-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M216,56H168V48a24,24,0,0,0-24-24H112A24,24,0,0,0,88,48v8H40a8,8,0,0,0,0,16h8V208a24,24,0,0,0,24,24H184a24,24,0,0,0,24-24V72h8a8,8,0,0,0,0-16ZM104,48a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8v8H104ZM176,208H80V72H176Z"/>
-    </symbol>
-    <symbol id="ph-pencil-fill" viewBox="0 0 256 256" fill="currentColor">
-      <path d="M227.3,73.4,182.6,28.7a16,16,0,0,0-22.6,0L44.7,143.9a8.1,8.1,0,0,0-2.1,3.7L32.2,206a8,8,0,0,0,9.3,9.3l58.4-10.4a8.1,8.1,0,0,0,3.7-2.1L227.3,96A16,16,0,0,0,227.3,73.4Zm-86.4,20.5,21.2,21.2L91,186.2l-21.2-21.2ZM168,66.3,189.7,88,168,109.7,146.3,88Z"/>
-    </symbol>
-    <symbol id="ph-star" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M128,20l30.2,61.2L224,92.3l-48,46.7,11.3,66-59.3-31.2L68.7,205l11.3-66-48-46.7,65.8-11.1Z"/>
-    </symbol>
-    <symbol id="ph-star-fill" viewBox="0 0 256 256" fill="#FFD54F" stroke="black" stroke-width="8">
-      <path d="M239.2,97.2a16,16,0,0,0-13.1-11l-56.5-8.2L147,25.7a16.1,16,0,0,0-28,0L86.4,78l-56.5,8.2a16,16,0,0,0-8.9,27.3l40.9,39.9-9.7,56.4A16.2,16,0,0,0,72,224.5L128,195l56,29.5a16,16,0,0,0,23.6-17.1l-9.7-56.4,40.9-39.9A16,16,0,0,0,239.2,97.2Z"/>
-    </symbol>
-    <symbol id="ph-plus" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M128 40v176M40 128h176"/>
-    </symbol>
-    <symbol id="ph-list" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M40 64h176M40 128h176M40 192h176"/>
-    </symbol>
-  </svg>
+      <div class="brand-text">
+        <div class="title">Intervalltidtager</div>
+        <div class="subtitle">Oppvarming • Intervaller • Nedkjøling</div>
+      </div>
+    </div>
 
-  <!-- TOPP -->
-  <header class="topbar">
-    <!-- Logo + tittel som lenke til Dashboard -->
-    <a id="brandLink" href="#" class="brand">
-      <img src="assets/logo2.png" alt="Logo" />
-      <span>Styrketrening</span>
-    </a>
+    <div class="top-actions">
+      <!-- Hamburgermeny-knapp (vises når det blir trangt) -->
+      <button id="btnMenu" class="btn ghost icon menu-btn" type="button" aria-label="Meny" title="Meny">
+        <i class="ph ph-list"></i>
+      </button>
 
-    <!-- Modulknapper (vises på bred skjerm) -->
-    <nav class="nav" id="mainNav">
-      <button data-route="dashboard" class="nav-btn active">Dashboard</button>
-      <button data-route="library" class="nav-btn">Øktvelger</button>
-      <button data-route="editor" class="nav-btn">Editor</button>
-      <button data-route="log" class="nav-btn">Logg</button>
-    </nav>
+      <!-- Menyinnhold: vises som toolbar på store skjermer, dropdown på små -->
+      <nav id="topMenu" class="top-menu" aria-label="Toppmeny">
+        <button id="btnToggleEditor" class="btn ghost menu-item" type="button" title="Skjul/vis editor">
+          <i class="ph ph-pencil-simple"></i><span>Editor</span>
+        </button>
 
-    <!-- Hamburgermeny (vises når nav skjules på smal skjerm) -->
-    <button id="hamburgerBtn" class="hamburger" aria-label="Meny">
-      <svg class="icon"><use href="#ph-list"></use></svg>
-    </button>
-    <div id="hamburgerMenu" class="hamburger-menu card" style="display:none;">
-      <button data-route="dashboard" class="menu-item">Dashboard</button>
-      <button data-route="library" class="menu-item">Øktvelger</button>
-      <button data-route="editor" class="menu-item">Editor</button>
-      <button data-route="log" class="menu-item">Logg</button>
+        <button id="btnExport" class="btn ghost menu-item" type="button" title="Eksporter lagrede">
+          <i class="ph ph-download-simple"></i><span>Eksporter</span>
+        </button>
+
+        <label class="btn ghost menu-item file" title="Importer lagrede (JSON)">
+          <i class="ph ph-upload-simple"></i><span>Import</span>
+          <input id="fileImport" type="file" accept="application/json" hidden>
+        </label>
+      </nav>
     </div>
   </header>
 
-  <main id="app" class="container"></main>
+  <main class="layout">
+    <!-- LEFT: Quick start + saved -->
+    <section class="panel" aria-label="Lagrede og hurtigstart">
+      <h2>Hurtigstart</h2>
+      <div id="quickButtons" class="quick" role="group" aria-label="Hurtigknapper"></div>
 
-  <footer class="footer">© 2026</footer>
+      <div class="row between">
+        <h2 class="section-title">Lagrede</h2>
+        <button id="btnNew" class="btn small" type="button">
+          <i class="ph ph-plus"></i><span>Ny</span>
+        </button>
+      </div>
+
+      <div class="hint">
+        Tips: “Fest” gjør den til hurtigknapp. “Skjul” fjerner den fra listen.
+      </div>
+
+      <div id="presetList" class="list" aria-label="Liste over lagrede tidtagere"></div>
+    </section>
+
+    <!-- CENTER: Timer -->
+    <section class="panel timer-panel" aria-label="Tidtagervindu">
+      <div class="timer-header">
+        <div>
+          <div class="label">Aktiv økt</div>
+          <div id="activeName" class="active-name">—</div>
+        </div>
+        <div class="meta">
+          <div class="chip" id="chipPhase">—</div>
+          <div class="chip" id="chipNext">Neste: —</div>
+        </div>
+      </div>
+
+      <div class="timer">
+        <div id="timeBig" class="time-big" aria-live="polite">00:00</div>
+
+        <div class="time-sub">
+          <span>Fase: <strong id="phaseName">—</strong></span>
+          <span>Total igjen: <strong id="totalLeft">00:00</strong></span>
+        </div>
+
+        <div class="progress" aria-label="Fremdrift i gjeldende fase">
+          <div id="progressBar" class="bar"></div>
+        </div>
+
+        <div class="controls" aria-label="Kontroller">
+          <button id="btnStartPause" class="btn primary" type="button">
+            <i class="ph ph-play"></i><span>Start</span>
+          </button>
+          <button id="btnReset" class="btn" type="button">
+            <i class="ph ph-arrow-counter-clockwise"></i><span>Reset</span>
+          </button>
+          <button id="btnPrev" class="btn" type="button">
+            <i class="ph ph-caret-left"></i><span>Forrige</span>
+          </button>
+          <button id="btnNext" class="btn" type="button">
+            <span>Neste</span><i class="ph ph-caret-right"></i>
+          </button>
+        </div>
+
+        <div class="toggles" aria-label="Innstillinger">
+          <label class="toggle">
+            <input id="chkBeep" type="checkbox">
+            <span><i class="ph ph-bell"></i> Beep (valgfritt)</span>
+          </label>
+          <label class="toggle">
+            <input id="chkKeepScreenOn" type="checkbox" checked>
+            <span><i class="ph ph-sun"></i> Hold skjerm våken</span>
+          </label>
+        </div>
+
+        <div id="timeline" class="timeline" aria-label="Faseoversikt"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Editor overlay -->
+  <div id="editorBackdrop" class="backdrop" hidden></div>
+
+  <section id="editorPanel" class="editor-drawer" aria-label="Editor" aria-hidden="true">
+    <div class="editor-header">
+      <div>
+        <div class="editor-title">Editor</div>
+        <div class="editor-sub">Lag intervaller med blokker og pauser mellom blokker</div>
+      </div>
+
+      <button id="btnCloseEditor" class="btn ghost icon" type="button" title="Lukk">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="editor-body">
+      <div class="form">
+        <label for="inpName">Navn</label>
+        <input id="inpName" type="text" placeholder="f.eks. 4x(6:00/1:00) + opp/ned" />
+
+        <div class="grid2">
+          <div>
+            <label for="inpWarmup">Oppvarming (mm:ss)</label>
+            <input id="inpWarmup" type="text" value="05:00" />
+          </div>
+          <div>
+            <label for="inpCooldown">Nedkjøling (mm:ss)</label>
+            <input id="inpCooldown" type="text" value="03:00" />
+          </div>
+        </div>
+
+        <div class="row between">
+          <h3>Intervallblokker</h3>
+          <button id="btnAddBlock" class="btn small" type="button">
+            <i class="ph ph-plus"></i><span>Legg til blokk</span>
+          </button>
+        </div>
+
+        <div id="blocks" class="blocks" aria-label="Intervallblokker"></div>
+
+        <div class="editor-actions">
+          <div class="row gap">
+            <button id="btnSave" class="btn primary" type="button">
+              <i class="ph ph-floppy-disk"></i><span>Lagre</span>
+            </button>
+            <button id="btnDelete" class="btn danger" type="button">
+              <i class="ph ph-trash"></i><span>Slett</span>
+            </button>
+          </div>
+
+          <div class="row gap">
+            <button id="btnPin" class="btn" type="button">
+              <i class="ph ph-push-pin"></i><span>Fest</span>
+            </button>
+            <button id="btnHide" class="btn" type="button">
+              <i class="ph ph-eye-slash"></i><span>Skjul</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="hint">
+          Format: <code>mm:ss</code> eller sekunder. Eksempel: <code>6:00</code>, <code>90</code>, <code>00:30</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>Førsteutkast – lagres lokalt i nettleser (localStorage)</span>
+    <span class="kbd">Space: start/pause • R: reset • N: neste • P: forrige</span>
+  </footer>
 
   <script src="app.js"></script>
-  <script src="modules/dashboard.js"></script>
-  <script src="modules/library.js"></script>
-  <script src="modules/editor.js"></script>
-  <script src="modules/session.js"></script>
-  <script src="modules/log.js"></script>
 </body>
 </html>
