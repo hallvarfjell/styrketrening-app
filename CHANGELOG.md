@@ -372,6 +372,8 @@ REVXX
 NY MODUL!
 Intervalltidtakar. Predefinerte intervaller (6x6, 30x45/15 etc). Også mulighet for å sette noko opp on the fly på få sekunder. Lagre nye timere, etc.
 
+Ved eksport av filer: La dem hete ååmmdd_Øvelser/Økter/Logg. Vurdere en knapp for synkronisering. HVORDAN SYNKRONISERE OVER ALLE ENHETER?
+
 GENERELT:
 - Rette opp skrivefeil her og der
 - Teit navn. Trenger nytt og bedre navn.
